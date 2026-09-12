@@ -1,9 +1,19 @@
-import { motion } from 'framer-motion';
+import { useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowUpRight, Code2, Music, Video, Gamepad2, Send, PenTool, Terminal, Globe, Network, MessageSquare } from 'lucide-react';
 
 export default function AboutSection() {
+  const containerRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end start"]
+  });
+  
+  // Moves from right to left as we scroll down
+  const x = useTransform(scrollYProgress, [0, 1], ["0%", "-50%"]);
+
   return (
-    <section id="about" className="relative w-full min-h-screen bg-[#E5E5E5] text-black pt-0 overflow-hidden selection:bg-blue-500/30">
+    <section ref={containerRef} id="about" className="relative w-full min-h-screen bg-[#E5E5E5] text-black pt-0 overflow-hidden selection:bg-blue-500/30">
       
       {/* Wrapper that cuts off the diagonal background and creates the full-width horizontal line */}
       <div className="relative w-full border-b border-[#757575]">
@@ -428,16 +438,23 @@ export default function AboutSection() {
         </div>
 
         {/* Extension of side lines */}
-        <div className="w-full h-24 sm:h-32 md:h-40 bg-transparent"></div>
+        <div className="w-full h-6 sm:h-8 md:h-10 bg-transparent"></div>
       </div>
       
     </div>
       
-      {/* Huge Bottom Text (Optional depending on how deep they scroll) */}
-      <div className="relative w-full overflow-hidden whitespace-nowrap mt-16 md:mt-24 mb-16 md:mb-24">
-        <h1 className="text-[12vw] font-black tracking-tighter text-black/90 leading-none flex items-center justify-center">
-          HIPPED <span className="mx-8 text-[8vw]">●</span> BROK
-        </h1>
+      {/* Huge Bottom Text (Scrubbed on scroll) */}
+      <div className="relative w-full overflow-hidden whitespace-nowrap mt-6 md:mt-12 mb-16 md:mb-24 flex">
+        <motion.div 
+          style={{ x }}
+          className="flex whitespace-nowrap text-[12vw] font-['Space_Grotesk',sans-serif] font-medium tracking-tight text-black/90 leading-none"
+        >
+          {/* Repeat text to ensure it covers the screen during translation */}
+          <span className="shrink-0">BUILT • SHIPPED • BROKEN • FIXED •&nbsp;</span>
+          <span className="shrink-0">BUILT • SHIPPED • BROKEN • FIXED •&nbsp;</span>
+          <span className="shrink-0">BUILT • SHIPPED • BROKEN • FIXED •&nbsp;</span>
+          <span className="shrink-0">BUILT • SHIPPED • BROKEN • FIXED •&nbsp;</span>
+        </motion.div>
       </div>
     </section>
   );
