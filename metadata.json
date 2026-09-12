@@ -1,0 +1,8 @@
+{
+  "name": "Remix Yash Mehta Portfolio",
+  "description": "Portfolio website for Yash Mehta, Backend Developer.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

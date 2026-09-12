@@ -1,0 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;700&family=Geist:wght@400;500&family=Playfair+Display:wght@400;500;600&display=swap');
+@import "tailwindcss";
+@import "lenis/dist/lenis.css";
+
+@theme {
+  --animate-marquee: marquee 90s linear infinite;
+  
+  @keyframes marquee {
+    0% { transform: translateX(0%); }
+    100% { transform: translateX(-50%); }
+  }
+}
+
