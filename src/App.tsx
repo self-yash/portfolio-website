@@ -6,7 +6,7 @@
 import Background from './components/Background';
 import Marquee from './components/Marquee';
 import AboutSection from './components/AboutSection';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import Lenis from 'lenis';
 import Snap from 'lenis/snap';
@@ -19,7 +19,85 @@ export default function App() {
 
   const { scrollY } = useScroll();
   const [windowHeight, setWindowHeight] = useState(800);
+  const [showAboutNavbar, setShowAboutNavbar] = useState(false);
   const aboutRef = useRef<HTMLDivElement>(null);
+  const lenisRef = useRef<Lenis | null>(null);
+
+  // Hero section custom white circle cursor
+  const [mousePos, setMousePos] = useState({ x: -100, y: -100 });
+  const [isHeroHovered, setIsHeroHovered] = useState(false);
+  const [isHoveringClickable, setIsHoveringClickable] = useState(false);
+
+  useEffect(() => {
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+
+      // If mouse Y is over or within the About section, disable hero custom cursor
+      if (aboutRef.current) {
+        const aboutRect = aboutRef.current.getBoundingClientRect();
+        if (e.clientY >= aboutRect.top) {
+          setIsHeroHovered(false);
+          return;
+        }
+      }
+
+      // If clientY is within the visible window above About section
+      if (e.clientY >= 0 && e.clientY <= window.innerHeight) {
+        setIsHeroHovered(true);
+      } else {
+        setIsHeroHovered(false);
+      }
+
+      const target = e.target as HTMLElement | null;
+      if (target && target.closest('button, a, [role="button"], input, textarea')) {
+        setIsHoveringClickable(true);
+      } else {
+        setIsHoveringClickable(false);
+      }
+    };
+
+    const handleMouseLeaveWindow = () => {
+      setIsHeroHovered(false);
+    };
+
+    window.addEventListener('mousemove', handleGlobalMouseMove);
+    document.addEventListener('mouseleave', handleMouseLeaveWindow);
+    return () => {
+      window.removeEventListener('mousemove', handleGlobalMouseMove);
+      document.removeEventListener('mouseleave', handleMouseLeaveWindow);
+    };
+  }, []);
+
+  const scrollToHome = () => {
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(0, {
+        duration: 1.6,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const scrollToAbout = () => {
+    if (lenisRef.current && aboutRef.current) {
+      lenisRef.current.scrollTo(aboutRef.current, {
+        duration: 1.6,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      });
+    } else {
+      aboutRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  // Monitor scroll to reveal navbar when arriving at the 2nd portion (About)
+  useEffect(() => {
+    const unsubscribe = scrollY.on("change", (latest) => {
+      const threshold = (windowHeight || 800) * 0.72;
+      setShowAboutNavbar(latest >= threshold);
+    });
+    return () => unsubscribe();
+  }, [scrollY, windowHeight]);
 
   // Smooth inertial scrolling and sticky snap for the 2nd portion
   useEffect(() => {
@@ -29,6 +107,7 @@ export default function App() {
       touchMultiplier: 1.2,
       smoothWheel: true,
     });
+    lenisRef.current = lenis;
 
     const snap = new Snap(lenis, {
       type: 'proximity',
@@ -41,6 +120,19 @@ export default function App() {
       snap.addElement(aboutRef.current);
     }
 
+    // Snapping only applies when scrolling from hero down towards about.
+    // Once reached or scrolling down within About, disable snap so it is never sticky when scrolling down from about.
+    const handleScroll = (l: Lenis) => {
+      const aboutTop = aboutRef.current ? aboutRef.current.offsetTop : windowHeight;
+      if (l.scroll >= aboutTop - 15) {
+        snap.stop();
+      } else {
+        snap.start();
+      }
+    };
+
+    lenis.on('scroll', handleScroll);
+
     let rafId: number;
     function raf(time: number) {
       lenis.raf(time);
@@ -50,10 +142,12 @@ export default function App() {
 
     return () => {
       cancelAnimationFrame(rafId);
+      lenis.off('scroll', handleScroll);
       snap.destroy();
       lenis.destroy();
+      lenisRef.current = null;
     };
-  }, []);
+  }, [windowHeight]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -123,7 +217,7 @@ export default function App() {
     <div className="relative w-full min-h-screen bg-black text-white font-sans selection:bg-blue-500/30 overflow-x-clip">
       
       {/* Hero Section (Sticky underneath) */}
-      <section className="sticky top-0 w-full h-[100dvh] overflow-hidden z-0">
+      <section className={`sticky top-0 w-full h-[100dvh] overflow-hidden z-0 ${isHeroHovered ? 'cursor-none [&_*]:cursor-none' : ''}`}>
         {/* Full-bleed background & glass panes stay unscaled and unblurred */}
         <Background />
         
@@ -152,7 +246,10 @@ export default function App() {
         >
           {/* Navbar */}
           <nav className="absolute top-0 left-0 w-full z-20 flex items-center justify-between px-8 py-6 md:px-16 md:py-8">
-            <div className="text-base md:text-lg font-['Playfair_Display',serif] tracking-tight uppercase flex-1">
+            <div 
+              onClick={scrollToHome}
+              className="text-lg md:text-xl lg:text-[22px] font-['Giordani_Registry','GIORDANI_Registry',serif] tracking-normal uppercase flex-1 cursor-pointer select-none transition-opacity hover:opacity-80 leading-none"
+            >
               Yash Mehta
             </div>
             
@@ -164,10 +261,20 @@ export default function App() {
               className="hidden md:flex flex-1 justify-center z-50"
             >
               <div className="flex items-center gap-1 p-1 rounded-full bg-white/[0.08] backdrop-blur-md border border-white/10 text-[15px] font-['Geist_Mono',monospace] font-bold">
-                <a href="#" className="px-5 py-2 rounded-full border border-white/20 border-r-white/80 bg-[linear-gradient(90deg,rgba(255,255,255,0.05),rgba(255,255,255,0.15))] backdrop-blur-3xl shadow-[inset_-1px_0_1px_rgba(255,255,255,0.8),inset_0_0_10px_rgba(255,255,255,0.1)] transition-all whitespace-nowrap">Home</a>
-                <a href="#" className="px-5 py-2 rounded-full border border-transparent hover:bg-white/5 transition-all text-white/80 hover:text-white whitespace-nowrap">About</a>
-                <a href="#" className="px-5 py-2 rounded-full border border-transparent hover:bg-white/5 transition-all text-white/80 hover:text-white whitespace-nowrap">Project</a>
-                <a href="#" className="px-5 py-2 rounded-full border border-transparent hover:bg-white/5 transition-all text-white/80 hover:text-white whitespace-nowrap">Stack</a>
+                <button 
+                  onClick={scrollToHome}
+                  className="px-5 py-2 rounded-full border border-white/20 border-r-white/80 bg-[linear-gradient(90deg,rgba(255,255,255,0.05),rgba(255,255,255,0.15))] backdrop-blur-3xl shadow-[inset_-1px_0_1px_rgba(255,255,255,0.8),inset_0_0_10px_rgba(255,255,255,0.1)] transition-all whitespace-nowrap cursor-pointer"
+                >
+                  Home
+                </button>
+                <button 
+                  onClick={scrollToAbout}
+                  className="px-5 py-2 rounded-full border border-transparent hover:bg-white/5 transition-all text-white/80 hover:text-white whitespace-nowrap cursor-pointer"
+                >
+                  About
+                </button>
+                <button className="px-5 py-2 rounded-full border border-transparent hover:bg-white/5 transition-all text-white/80 hover:text-white whitespace-nowrap cursor-pointer">Project</button>
+                <button className="px-5 py-2 rounded-full border border-transparent hover:bg-white/5 transition-all text-white/80 hover:text-white whitespace-nowrap cursor-pointer">Stack</button>
               </div>
             </motion.div>
             
@@ -237,12 +344,12 @@ export default function App() {
               </div>
 
               <div className="mt-5 flex flex-col sm:flex-row items-center gap-4">
-                <a 
-                  href="#about" 
-                  className="w-full sm:w-auto px-[30px] py-3 rounded-full bg-[#1AA1FF] text-black font-['Geist_Mono',monospace] font-normal tracking-wide transition-all duration-300 flex items-center justify-center gap-2 hover:-translate-y-1 hover:shadow-[0_0_74.5px_2px_rgba(31,156,240,0.62)]"
+                <button 
+                  onClick={scrollToAbout}
+                  className="w-full sm:w-auto px-[30px] py-3 rounded-full bg-[#1AA1FF] text-black font-['Geist_Mono',monospace] font-normal tracking-wide transition-all duration-300 flex items-center justify-center gap-2 hover:-translate-y-1 hover:shadow-[0_0_74.5px_2px_rgba(31,156,240,0.62)] cursor-pointer"
                 >
                   Dive in &darr;
-                </a>
+                </button>
                 <a 
                   href="mailto:yashmehta0005@gmail.com" 
                   className="w-full sm:w-auto px-5 py-3 rounded-full bg-transparent border border-[#000000]/[0.39] hover:border-[#0099FF] hover:bg-white/10 text-[#B0C4EA] hover:text-white font-['Geist_Mono',monospace] text-sm tracking-wide transition-all duration-300 flex items-center justify-center"
@@ -262,6 +369,63 @@ export default function App() {
       <div ref={aboutRef} className="relative z-10 w-full shadow-[0_-15px_35px_rgba(0,0,0,0.28)]">
         <AboutSection />
       </div>
+
+      {/* Floating Navbar (exact same glass pill as hero) that animates in from top center after 1.5-second delay when scrolled to 2nd portion */}
+      <AnimatePresence>
+        {showAboutNavbar && (
+          <motion.div
+            key="about-fixed-navbar"
+            initial={{ y: -60, x: "-50%", opacity: 0 }}
+            animate={{ 
+              y: 0, 
+              x: "-50%", 
+              opacity: 1, 
+              transition: { delay: 1.5, duration: 0.34, ease: "easeOut" } 
+            }}
+            exit={{ 
+              y: -60, 
+              x: "-50%", 
+              opacity: 0, 
+              transition: { delay: 0, duration: 0.22, ease: "easeIn" } 
+            }}
+            className="fixed top-6 md:top-8 left-1/2 z-50 flex items-center justify-center pointer-events-auto"
+          >
+            <div className="flex items-center gap-1 p-1 rounded-full bg-white/[0.08] backdrop-blur-md border border-white/10 text-[15px] font-['Geist_Mono',monospace] font-bold shadow-[0_8px_32px_rgba(0,0,0,0.12)]">
+              <button 
+                onClick={scrollToHome}
+                className="px-5 py-2 rounded-full border border-transparent hover:bg-white/5 transition-all text-black/80 hover:text-black whitespace-nowrap cursor-pointer"
+              >
+                Home
+              </button>
+              <button 
+                onClick={scrollToAbout}
+                className="px-5 py-2 rounded-full border border-white/20 border-r-white/80 bg-[linear-gradient(90deg,rgba(255,255,255,0.05),rgba(255,255,255,0.15))] backdrop-blur-3xl shadow-[inset_-1px_0_1px_rgba(255,255,255,0.8),inset_0_0_10px_rgba(255,255,255,0.1)] transition-all whitespace-nowrap cursor-pointer text-black"
+              >
+                About
+              </button>
+              <button className="px-5 py-2 rounded-full border border-transparent hover:bg-white/5 transition-all text-black/80 hover:text-black whitespace-nowrap cursor-pointer">
+                Project
+              </button>
+              <button className="px-5 py-2 rounded-full border border-transparent hover:bg-white/5 transition-all text-black/80 hover:text-black whitespace-nowrap cursor-pointer">
+                Stack
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Small white circle cursor active when hovering in Hero section */}
+      <div 
+        className={`fixed pointer-events-none z-[9999] rounded-full bg-white -translate-x-1/2 -translate-y-1/2 shadow-[0_0_8px_rgba(255,255,255,0.7)] transition-opacity duration-150 ease-out ${
+          isHeroHovered ? 'opacity-100' : 'opacity-0'
+        } ${
+          isHoveringClickable ? 'w-3.5 h-3.5' : 'w-2 h-2'
+        }`}
+        style={{
+          left: `${mousePos.x}px`,
+          top: `${mousePos.y}px`,
+        }}
+      />
     </div>
   );
 }

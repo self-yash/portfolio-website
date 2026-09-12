@@ -1,6 +1,24 @@
-@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;700&family=Geist:wght@400;500&family=Playfair+Display:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;700&family=Geist:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap');
 @import "tailwindcss";
 @import "lenis/dist/lenis.css";
+
+@font-face {
+  font-family: 'Giordani Registry';
+  src: url('./assets/fonts/giordani-registy.otf') format('opentype'),
+       url('/fonts/giordani-registy.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'GIORDANI Registry';
+  src: url('./assets/fonts/giordani-registy.otf') format('opentype'),
+       url('/fonts/giordani-registy.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
 
 @theme {
   --animate-marquee: marquee 90s linear infinite;
@@ -9,5 +27,21 @@
     0% { transform: translateX(0%); }
     100% { transform: translateX(-50%); }
   }
+}
+
+/* Hide default browser scrollbar while preserving full scrolling */
+html,
+body,
+* {
+  -ms-overflow-style: none !important;  /* IE and Edge */
+  scrollbar-width: none !important;  /* Firefox */
+}
+
+::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  display: none !important;  /* Chrome, Safari, Opera */
+  width: 0px !important;
+  height: 0px !important;
+  background: transparent !important;
 }
 
