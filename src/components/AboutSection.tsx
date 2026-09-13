@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowUpRight, Code2, Music, Video, Gamepad2, Send, PenTool, Terminal, Globe, Network, MessageSquare } from 'lucide-react';
+import ProjectsSection from './ProjectsSection';
 
 export default function AboutSection() {
   const containerRef = useRef<HTMLElement>(null);
@@ -9,8 +10,8 @@ export default function AboutSection() {
     offset: ["start end", "end start"]
   });
   
-  // Moves from right to left as we scroll down, shifted to start at -5%
-  const x = useTransform(scrollYProgress, [0, 1], ["-5%", "-55%"]);
+  // Moves from right to left as we scroll down, starting at 0%
+  const x = useTransform(scrollYProgress, [0, 1], ["0%", "-50%"]);
 
   return (
     <section ref={containerRef} id="about" className="relative w-full min-h-screen bg-[#E5E5E5] text-black pt-0 overflow-hidden selection:bg-blue-500/30">
@@ -463,8 +464,8 @@ export default function AboutSection() {
       
     </div>
       
-      {/* Huge Bottom Text (Scrubbed on scroll) */}
-      <div className="relative w-full overflow-hidden whitespace-nowrap mt-[19px] md:mt-[38px] mb-[51px] md:mb-[77px] flex">
+      {/* Huge Bottom Text (Scrubbed on scroll, vertically centered between top and bottom border lines) */}
+      <div className="relative w-full overflow-hidden whitespace-nowrap py-7 sm:py-9 md:py-12 flex items-center justify-center">
         <motion.div 
           style={{ x }}
           className="flex whitespace-nowrap text-[12vw] font-['Space_Grotesk',sans-serif] font-medium tracking-tight leading-none"
@@ -508,6 +509,9 @@ export default function AboutSection() {
           </span>
         </motion.div>
       </div>
+
+      {/* Projects Section */}
+      <ProjectsSection />
     </section>
   );
 }

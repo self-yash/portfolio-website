@@ -20,6 +20,7 @@ export default function App() {
   const { scrollY } = useScroll();
   const [windowHeight, setWindowHeight] = useState(800);
   const [showAboutNavbar, setShowAboutNavbar] = useState(false);
+  const [activeSection, setActiveSection] = useState<'home' | 'about' | 'projects' | 'stack'>('home');
   const aboutRef = useRef<HTMLDivElement>(null);
   const lenisRef = useRef<Lenis | null>(null);
 
@@ -90,13 +91,56 @@ export default function App() {
     }
   };
 
-  // Monitor scroll to reveal navbar when arriving at the 2nd portion (About)
+  const scrollToProject = () => {
+    const el = document.getElementById('projects');
+    if (el) {
+      if (lenisRef.current) {
+        lenisRef.current.scrollTo(el, {
+          duration: 1.6,
+          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        });
+      } else {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
+
+  // Monitor scroll to reveal navbar when arriving at the 2nd portion (About) and switch active tab
   useEffect(() => {
-    const unsubscribe = scrollY.on("change", (latest) => {
+    const handleScroll = () => {
+      const scrollYPos = window.scrollY;
       const threshold = (windowHeight || 800) * 0.72;
-      setShowAboutNavbar(latest >= threshold);
-    });
-    return () => unsubscribe();
+      setShowAboutNavbar(scrollYPos >= threshold);
+
+      const aboutEl = aboutRef.current;
+      const projectsEl = document.getElementById('projects');
+
+      if (aboutEl && projectsEl) {
+        // Calculate stable absolute document offsets
+        const aboutTop = scrollYPos + aboutEl.getBoundingClientRect().top;
+        const projectsTop = scrollYPos + projectsEl.getBoundingClientRect().top;
+
+        if (scrollYPos >= projectsTop - 240) {
+          setActiveSection('projects');
+        } else if (scrollYPos >= aboutTop - 240) {
+          setActiveSection('about');
+        } else {
+          setActiveSection('home');
+        }
+      }
+    };
+
+    // Attach to framer-motion scroll as well as native scroll for absolute reliability
+    const unsubscribe = scrollY.on("change", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    
+    // Initial check
+    handleScroll();
+
+    return () => {
+      unsubscribe();
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, [scrollY, windowHeight]);
 
   // Smooth inertial scrolling and sticky snap for the 2nd portion
@@ -263,17 +307,34 @@ export default function App() {
               <div className="flex items-center gap-1 p-1 rounded-full bg-white/[0.08] backdrop-blur-md border border-white/10 text-[15px] font-['Geist_Mono',monospace] font-bold">
                 <button 
                   onClick={scrollToHome}
-                  className="px-5 py-2 rounded-full border border-white/20 border-r-white/80 bg-[linear-gradient(90deg,rgba(255,255,255,0.05),rgba(255,255,255,0.15))] backdrop-blur-3xl shadow-[inset_-1px_0_1px_rgba(255,255,255,0.8),inset_0_0_10px_rgba(255,255,255,0.1)] transition-all whitespace-nowrap cursor-pointer"
+                  className={`px-5 py-2 rounded-full transition-all whitespace-nowrap cursor-pointer ${
+                    activeSection === 'home'
+                      ? "border border-white/20 border-r-white/80 bg-[linear-gradient(90deg,rgba(255,255,255,0.05),rgba(255,255,255,0.15))] backdrop-blur-3xl shadow-[inset_-1px_0_1px_rgba(255,255,255,0.8),inset_0_0_10px_rgba(255,255,255,0.1)] text-white"
+                      : "border border-transparent hover:bg-white/5 text-white/80 hover:text-white"
+                  }`}
                 >
                   Home
                 </button>
                 <button 
                   onClick={scrollToAbout}
-                  className="px-5 py-2 rounded-full border border-transparent hover:bg-white/5 transition-all text-white/80 hover:text-white whitespace-nowrap cursor-pointer"
+                  className={`px-5 py-2 rounded-full transition-all whitespace-nowrap cursor-pointer ${
+                    activeSection === 'about'
+                      ? "border border-white/20 border-r-white/80 bg-[linear-gradient(90deg,rgba(255,255,255,0.05),rgba(255,255,255,0.15))] backdrop-blur-3xl shadow-[inset_-1px_0_1px_rgba(255,255,255,0.8),inset_0_0_10px_rgba(255,255,255,0.1)] text-white"
+                      : "border border-transparent hover:bg-white/5 text-white/80 hover:text-white"
+                  }`}
                 >
                   About
                 </button>
-                <button className="px-5 py-2 rounded-full border border-transparent hover:bg-white/5 transition-all text-white/80 hover:text-white whitespace-nowrap cursor-pointer">Project</button>
+                <button 
+                  onClick={scrollToProject}
+                  className={`px-5 py-2 rounded-full transition-all whitespace-nowrap cursor-pointer ${
+                    activeSection === 'projects'
+                      ? "border border-white/20 border-r-white/80 bg-[linear-gradient(90deg,rgba(255,255,255,0.05),rgba(255,255,255,0.15))] backdrop-blur-3xl shadow-[inset_-1px_0_1px_rgba(255,255,255,0.8),inset_0_0_10px_rgba(255,255,255,0.1)] text-white"
+                      : "border border-transparent hover:bg-white/5 text-white/80 hover:text-white"
+                  }`}
+                >
+                  Project
+                </button>
                 <button className="px-5 py-2 rounded-full border border-transparent hover:bg-white/5 transition-all text-white/80 hover:text-white whitespace-nowrap cursor-pointer">Stack</button>
               </div>
             </motion.div>
@@ -390,25 +451,34 @@ export default function App() {
             }}
             className="fixed top-6 md:top-8 left-1/2 z-50 flex items-center justify-center pointer-events-auto"
           >
-            <div className="flex items-center gap-1 p-1 rounded-full bg-white/[0.08] backdrop-blur-md border border-white/10 text-[15px] font-['Geist_Mono',monospace] font-bold shadow-[0_8px_32px_rgba(0,0,0,0.12)]">
-              <button 
-                onClick={scrollToHome}
-                className="px-5 py-2 rounded-full border border-transparent hover:bg-white/5 transition-all text-black/80 hover:text-black whitespace-nowrap cursor-pointer"
-              >
-                Home
-              </button>
-              <button 
-                onClick={scrollToAbout}
-                className="px-5 py-2 rounded-full border border-white/20 border-r-white/80 bg-[linear-gradient(90deg,rgba(255,255,255,0.05),rgba(255,255,255,0.15))] backdrop-blur-3xl shadow-[inset_-1px_0_1px_rgba(255,255,255,0.8),inset_0_0_10px_rgba(255,255,255,0.1)] transition-all whitespace-nowrap cursor-pointer text-black"
-              >
-                About
-              </button>
-              <button className="px-5 py-2 rounded-full border border-transparent hover:bg-white/5 transition-all text-black/80 hover:text-black whitespace-nowrap cursor-pointer">
-                Project
-              </button>
-              <button className="px-5 py-2 rounded-full border border-transparent hover:bg-white/5 transition-all text-black/80 hover:text-black whitespace-nowrap cursor-pointer">
-                Stack
-              </button>
+            <div className="flex items-center gap-1 p-1 rounded-full bg-[rgba(255,255,255,0.72)] backdrop-blur-[20px] backdrop-saturate-[180%] border border-black/10 text-[15px] font-['Geist_Mono',monospace] font-bold shadow-[0_8px_32px_rgba(0,0,0,0.08)]">
+              {['home', 'about', 'projects', 'stack'].map((sectionId) => (
+                <button 
+                  key={sectionId}
+                  onClick={() => {
+                    if (sectionId === 'home') scrollToHome();
+                    if (sectionId === 'about') scrollToAbout();
+                    if (sectionId === 'projects') scrollToProject();
+                  }}
+                  className={`relative px-5 py-2 rounded-full whitespace-nowrap cursor-pointer transition-colors duration-300 ${
+                    activeSection === sectionId
+                      ? "text-black"
+                      : "text-black/70 hover:text-black hover:bg-black/5"
+                  }`}
+                >
+                  {/* The actual label */}
+                  <span className="relative z-10 capitalize">{sectionId}</span>
+                  
+                  {/* The sliding pill background using Framer Motion's layoutId */}
+                  {activeSection === sectionId && (
+                    <motion.div
+                      layoutId="activePill"
+                      className="absolute inset-0 bg-white rounded-full border border-black/[0.04] shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
+                      transition={{ type: "spring", stiffness: 200, damping: 25, mass: 1 }}
+                    />
+                  )}
+                </button>
+              ))}
             </div>
           </motion.div>
         )}
