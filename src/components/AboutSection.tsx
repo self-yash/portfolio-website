@@ -2,6 +2,8 @@ import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowUpRight, Code2, Music, Video, Gamepad2, Send, PenTool, Terminal, Globe, Network, MessageSquare } from 'lucide-react';
 import ProjectsSection from './ProjectsSection';
+import StackSection from './StackSection';
+import FooterSection from './FooterSection';
 
 export default function AboutSection() {
   const containerRef = useRef<HTMLElement>(null);
@@ -512,6 +514,12 @@ export default function AboutSection() {
 
       {/* Projects Section */}
       <ProjectsSection />
+
+      {/* Stack Section */}
+      <StackSection />
+
+      {/* Footer Section */}
+      <FooterSection />
     </section>
   );
 }

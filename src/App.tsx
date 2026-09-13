@@ -107,41 +107,48 @@ export default function App() {
 
   // Monitor scroll to reveal navbar when arriving at the 2nd portion (About) and switch active tab
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollYPos = window.scrollY;
+    const unsubscribe = scrollY.on("change", (latest) => {
       const threshold = (windowHeight || 800) * 0.72;
-      setShowAboutNavbar(scrollYPos >= threshold);
+      setShowAboutNavbar(latest >= threshold);
 
-      const aboutEl = aboutRef.current;
       const projectsEl = document.getElementById('projects');
-
-      if (aboutEl && projectsEl) {
-        // Calculate stable absolute document offsets
-        const aboutTop = scrollYPos + aboutEl.getBoundingClientRect().top;
-        const projectsTop = scrollYPos + projectsEl.getBoundingClientRect().top;
-
-        if (scrollYPos >= projectsTop - 240) {
-          setActiveSection('projects');
-        } else if (scrollYPos >= aboutTop - 240) {
-          setActiveSection('about');
-        } else {
-          setActiveSection('home');
+      const stackEl = document.getElementById('stack');
+      
+      let newActiveSection: 'home' | 'about' | 'projects' | 'stack' = 'home';
+      
+      if (latest >= threshold) {
+        newActiveSection = 'about';
+      }
+      
+      if (projectsEl) {
+        const pRect = projectsEl.getBoundingClientRect();
+        if (pRect.top <= 240) {
+          newActiveSection = 'projects';
         }
       }
-    };
-
-    // Attach to framer-motion scroll as well as native scroll for absolute reliability
-    const unsubscribe = scrollY.on("change", handleScroll);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    
-    // Initial check
-    handleScroll();
-
-    return () => {
-      unsubscribe();
-      window.removeEventListener("scroll", handleScroll);
-    };
+      
+      if (stackEl) {
+        const sRect = stackEl.getBoundingClientRect();
+        if (sRect.top <= 240) {
+          newActiveSection = 'stack';
+        }
+      }
+      
+      setActiveSection(newActiveSection);
+    });
+    return () => unsubscribe();
   }, [scrollY, windowHeight]);
+
+  const scrollToStack = () => {
+    const el = document.getElementById('stack');
+    if (el) {
+      if (lenisRef.current) {
+        lenisRef.current.scrollTo(el, { offset: 0, duration: 1.2 });
+      } else {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
 
   // Smooth inertial scrolling and sticky snap for the 2nd portion
   useEffect(() => {
@@ -335,7 +342,16 @@ export default function App() {
                 >
                   Project
                 </button>
-                <button className="px-5 py-2 rounded-full border border-transparent hover:bg-white/5 transition-all text-white/80 hover:text-white whitespace-nowrap cursor-pointer">Stack</button>
+                <button 
+                  onClick={scrollToStack}
+                  className={`px-5 py-2 rounded-full transition-all whitespace-nowrap cursor-pointer ${
+                    activeSection === 'stack'
+                      ? "border border-white/20 border-r-white/80 bg-[linear-gradient(90deg,rgba(255,255,255,0.05),rgba(255,255,255,0.15))] backdrop-blur-3xl shadow-[inset_-1px_0_1px_rgba(255,255,255,0.8),inset_0_0_10px_rgba(255,255,255,0.1)] text-white"
+                      : "border border-transparent hover:bg-white/5 text-white/80 hover:text-white"
+                  }`}
+                >
+                  Stack
+                </button>
               </div>
             </motion.div>
             
@@ -452,33 +468,46 @@ export default function App() {
             className="fixed top-6 md:top-8 left-1/2 z-50 flex items-center justify-center pointer-events-auto"
           >
             <div className="flex items-center gap-1 p-1 rounded-full bg-[rgba(255,255,255,0.72)] backdrop-blur-[20px] backdrop-saturate-[180%] border border-black/10 text-[15px] font-['Geist_Mono',monospace] font-bold shadow-[0_8px_32px_rgba(0,0,0,0.08)]">
-              {['home', 'about', 'projects', 'stack'].map((sectionId) => (
-                <button 
-                  key={sectionId}
-                  onClick={() => {
-                    if (sectionId === 'home') scrollToHome();
-                    if (sectionId === 'about') scrollToAbout();
-                    if (sectionId === 'projects') scrollToProject();
-                  }}
-                  className={`relative px-5 py-2 rounded-full whitespace-nowrap cursor-pointer transition-colors duration-300 ${
-                    activeSection === sectionId
-                      ? "text-black"
-                      : "text-black/70 hover:text-black hover:bg-black/5"
-                  }`}
-                >
-                  {/* The actual label */}
-                  <span className="relative z-10 capitalize">{sectionId}</span>
-                  
-                  {/* The sliding pill background using Framer Motion's layoutId */}
-                  {activeSection === sectionId && (
-                    <motion.div
-                      layoutId="activePill"
-                      className="absolute inset-0 bg-white rounded-full border border-black/[0.04] shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
-                      transition={{ type: "spring", stiffness: 200, damping: 25, mass: 1 }}
-                    />
-                  )}
-                </button>
-              ))}
+              <button 
+                onClick={scrollToHome}
+                className={`px-5 py-2 rounded-full transition-all whitespace-nowrap cursor-pointer ${
+                  activeSection === 'home'
+                    ? "border border-black/[0.04] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] text-black"
+                    : "border border-transparent hover:bg-black/5 text-black/70 hover:text-black"
+                }`}
+              >
+                Home
+              </button>
+              <button 
+                onClick={scrollToAbout}
+                className={`px-5 py-2 rounded-full transition-all whitespace-nowrap cursor-pointer ${
+                  activeSection === 'about'
+                    ? "border border-black/[0.04] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] text-black"
+                    : "border border-transparent hover:bg-black/5 text-black/70 hover:text-black"
+                }`}
+              >
+                About
+              </button>
+              <button 
+                onClick={scrollToProject}
+                className={`px-5 py-2 rounded-full transition-all whitespace-nowrap cursor-pointer ${
+                  activeSection === 'projects'
+                    ? "border border-black/[0.04] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] text-black"
+                    : "border border-transparent hover:bg-black/5 text-black/70 hover:text-black"
+                }`}
+              >
+                Project
+              </button>
+              <button 
+                onClick={scrollToStack}
+                className={`px-5 py-2 rounded-full transition-all whitespace-nowrap cursor-pointer ${
+                  activeSection === 'stack'
+                    ? "border border-black/[0.04] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] text-black"
+                    : "border border-transparent hover:bg-black/5 text-black/70 hover:text-black"
+                }`}
+              >
+                Stack
+              </button>
             </div>
           </motion.div>
         )}
