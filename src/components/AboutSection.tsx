@@ -9,8 +9,8 @@ export default function AboutSection() {
     offset: ["start end", "end start"]
   });
   
-  // Moves from right to left as we scroll down
-  const x = useTransform(scrollYProgress, [0, 1], ["0%", "-50%"]);
+  // Moves from right to left as we scroll down, shifted to start at -5%
+  const x = useTransform(scrollYProgress, [0, 1], ["-5%", "-55%"]);
 
   return (
     <section ref={containerRef} id="about" className="relative w-full min-h-screen bg-[#E5E5E5] text-black pt-0 overflow-hidden selection:bg-blue-500/30">
@@ -86,28 +86,32 @@ export default function AboutSection() {
                   A collection of games I enjoy, replay, and occasionally get way too competitive about.
                 </p>
                 
-                {/* Stacked Game Cards Visual - Reduced spacing between cards, Valorant poster as 3rd image, Forza 2nd, Cyberpunk front */}
+                {/* Stacked Game Cards Visual - Reduced spacing between cards, Genshin 5th, TLOU 4th, Valorant 3rd, Forza 2nd, Cyberpunk front */}
                 <div className="absolute right-2 sm:right-4 md:right-6 top-1/2 -translate-y-1/2 flex items-center justify-end pointer-events-none">
-                  <div className="relative flex items-center h-40 sm:h-44 lg:h-48 w-40 sm:w-48 lg:w-52 justify-end">
+                  <div className="relative flex items-center h-40 sm:h-44 lg:h-48 w-40 sm:w-48 lg:w-[250px] justify-end">
                     
-                    {/* Card 1: Backmost Gradient Accent Card */}
-                    <div className="absolute right-12 sm:right-15 lg:right-18 w-24 sm:w-28 lg:w-[114px] h-36 sm:h-40 lg:h-44 rounded-2xl overflow-hidden border border-black/10 bg-gradient-to-b from-[#6D95BE] via-[#9BC0E2] to-[#2B4366] flex flex-col justify-between p-2">
-                      <div className="text-[7px] text-white/80 font-bold tracking-widest uppercase">Riot</div>
-                      <div className="text-[9px] font-black text-white/70 rotate-90 origin-bottom-left ml-2 tracking-widest">
-                        VALORANT
-                      </div>
+                    {/* Card 1: Genshin Impact (5th image) */}
+                    <div className="absolute right-12 sm:right-15 lg:right-[72px] w-24 sm:w-28 lg:w-[114px] h-36 sm:h-40 lg:h-44 rounded-2xl overflow-hidden border border-black/10 bg-white flex flex-col justify-between shadow-sm z-[1]">
+                      <img 
+                        src="/images/genshin.jpg" 
+                        alt="Genshin Impact" 
+                        className="w-full h-full object-cover object-center"
+                        referrerPolicy="no-referrer"
+                      />
                     </div>
 
-                    {/* Card 2: CS:GO Dark Accent Card */}
-                    <div className="absolute right-9 sm:right-11 lg:right-13.5 w-24 sm:w-28 lg:w-[114px] h-36 sm:h-40 lg:h-44 rounded-2xl overflow-hidden border border-black/10 bg-gradient-to-b from-[#4A4237] via-[#2A241F] to-[#151311] flex flex-col justify-between p-2">
-                      <div className="text-[7px] text-white/60 font-semibold tracking-wider">VALVE</div>
-                      <div className="text-[9px] font-black text-white/60 rotate-90 origin-bottom-left ml-2 tracking-widest">
-                        CS:GO
-                      </div>
+                    {/* Card 2: The Last of Us Part I (4th image) */}
+                    <div className="absolute right-9 sm:right-11 lg:right-[54px] w-24 sm:w-28 lg:w-[114px] h-36 sm:h-40 lg:h-44 rounded-2xl overflow-hidden border border-black/10 shadow-sm z-[2] bg-black">
+                      <img 
+                        src="/images/tlou.jpg" 
+                        alt="The Last of Us Part I" 
+                        className="w-full h-full object-cover object-center"
+                        referrerPolicy="no-referrer"
+                      />
                     </div>
 
-                    {/* Card 3: Valorant Key Art Poster (3rd image in stack behind Forza & Cyberpunk) */}
-                    <div className="absolute right-6 sm:right-7.5 lg:right-9 w-24 sm:w-28 lg:w-[114px] h-36 sm:h-40 lg:h-44 rounded-2xl overflow-hidden border border-black/10 shadow-sm z-[5] bg-[#E8333D]">
+                    {/* Card 3: Valorant Key Art Poster (3rd image) */}
+                    <div className="absolute right-6 sm:right-7.5 lg:right-[36px] w-24 sm:w-28 lg:w-[114px] h-36 sm:h-40 lg:h-44 rounded-2xl overflow-hidden border border-black/10 shadow-sm z-[3] bg-[#E8333D]">
                       <img 
                         src="/images/valorant.jpg" 
                         alt="Valorant" 
@@ -116,8 +120,8 @@ export default function AboutSection() {
                       />
                     </div>
 
-                    {/* Card 4 (2nd Game behind Cyberpunk): Official Forza Horizon 6 Poster */}
-                    <div className="absolute right-3 sm:right-4 lg:right-4.5 w-24 sm:w-28 lg:w-[114px] h-36 sm:h-40 lg:h-44 rounded-2xl overflow-hidden border border-black/10 shadow-sm z-10 bg-white">
+                    {/* Card 4: Official Forza Horizon 6 Poster (2nd image) */}
+                    <div className="absolute right-3 sm:right-4 lg:right-[18px] w-24 sm:w-28 lg:w-[114px] h-36 sm:h-40 lg:h-44 rounded-2xl overflow-hidden border border-black/10 shadow-sm z-[4] bg-white">
                       <img 
                         src="/images/forza.jpg" 
                         alt="Forza Horizon 6" 
@@ -126,8 +130,8 @@ export default function AboutSection() {
                       />
                     </div>
 
-                    {/* Card 5 (Front): Cyberpunk 2077 Official Poster - No hover effect */}
-                    <div className="absolute right-0 w-24 sm:w-28 lg:w-[114px] h-36 sm:h-40 lg:h-44 rounded-2xl shadow-[0_10px_24px_rgba(0,0,0,0.25)] border border-white/40 overflow-hidden z-20 bg-[#FCE100]">
+                    {/* Card 5 (Front): Cyberpunk 2077 Official Poster */}
+                    <div className="absolute right-0 w-24 sm:w-28 lg:w-[114px] h-36 sm:h-40 lg:h-44 rounded-2xl shadow-[0_10px_24px_rgba(0,0,0,0.25)] border border-white/40 overflow-hidden z-[5] bg-[#FCE100]">
                       <img 
                         src="/images/cyberpunk.jpg" 
                         alt="Cyberpunk 2077" 
@@ -146,7 +150,7 @@ export default function AboutSection() {
             <div className="flex flex-col gap-3">
               
               {/* Toolbox Card - Reduced length: 240px with crisp #757575 border, 18px radius, more breathing space, no hover effect */}
-              <div className="bg-[#F8F8F9] rounded-[18px] p-5 md:p-6 border border-[#757575] flex flex-col items-center justify-center overflow-hidden relative h-auto min-h-[210px] lg:h-[240px]">
+              <div className="bg-[#F8F8F9] rounded-[18px] p-5 md:p-6 border border-[#757575] flex flex-col items-center justify-center overflow-hidden relative h-auto min-h-[210px] lg:h-[240px] group cursor-pointer">
                 <h3 className="text-[16px] font-['Geist',sans-serif] font-medium text-black mb-1.5 z-10 text-center">
                   Toolbox
                 </h3>
@@ -159,17 +163,17 @@ export default function AboutSection() {
                   
                   {/* 1. Premiere Pr - Outer Left (69% scale), exactly 26% opacity to fade out */}
                   <div 
-                    className="shrink-0 w-[66px] h-[66px] sm:w-[72px] sm:h-[72px] rounded-[16px] p-[4px] sm:p-[4.5px] flex items-center justify-center cursor-pointer opacity-[0.26]"
+                    className="shrink-0 w-[82px] h-[82px] sm:w-[88px] sm:h-[88px] rounded-[20px] p-[5px] flex items-center justify-center cursor-pointer opacity-[0.26] transition-all duration-500 group-hover:delay-150 group-hover:-translate-y-[7px] border-[1.4px] border-[#D6DADE] group-hover:border-[#818CF8]"
                     style={{
                       backgroundColor: '#F7F7F8',
-                      border: '1.85px solid #D6DADE',
                     }}
                   >
                     <div 
-                      className="w-full h-full rounded-[12px] flex items-center justify-center"
+                      className="w-full h-full rounded-[16px] flex items-center justify-center"
                       style={{
+                        backgroundColor: 'rgba(237, 238, 240, 0.85)',
                         border: '1.85px solid rgba(230, 231, 234, 0.5)',
-                        boxShadow: 'inset 0px -3.7px 3.7px rgba(0, 0, 0, 0.25)',
+                        boxShadow: 'inset 0px 3.7px 3.7px rgba(0, 0, 0, 0.18)',
                       }}
                     >
                       <img 
@@ -183,17 +187,17 @@ export default function AboutSection() {
 
                   {/* 2. Figma - Mid Left (77% scale) */}
                   <div 
-                    className="shrink-0 w-[74px] h-[74px] sm:w-[80px] sm:h-[80px] rounded-[18px] p-[4.5px] sm:p-[5px] flex items-center justify-center cursor-pointer"
+                    className="shrink-0 w-[90px] h-[90px] sm:w-[96px] sm:h-[96px] rounded-[20px] p-[5px] flex items-center justify-center cursor-pointer transition-all duration-500 group-hover:delay-75 group-hover:-translate-y-[10px] border-[1.4px] border-[#D6DADE] group-hover:border-[#818CF8]"
                     style={{
                       backgroundColor: '#F7F7F8',
-                      border: '1.85px solid #D6DADE',
                     }}
                   >
                     <div 
-                      className="w-full h-full rounded-[14px] flex items-center justify-center"
+                      className="w-full h-full rounded-[16px] flex items-center justify-center"
                       style={{
+                        backgroundColor: 'rgba(237, 238, 240, 0.85)',
                         border: '1.85px solid rgba(230, 231, 234, 0.5)',
-                        boxShadow: 'inset 0px -3.7px 3.7px rgba(0, 0, 0, 0.25)',
+                        boxShadow: 'inset 0px 3.7px 3.7px rgba(0, 0, 0, 0.18)',
                       }}
                     >
                       <img 
@@ -207,17 +211,17 @@ export default function AboutSection() {
 
                   {/* 3. VS Code - Center Hero size (100% scale) */}
                   <div 
-                    className="shrink-0 w-[96px] h-[96px] sm:w-[104px] sm:h-[104px] rounded-[20px] p-[5px] sm:p-[6px] flex items-center justify-center cursor-pointer z-20"
+                    className="shrink-0 w-[112px] h-[112px] sm:w-[120px] sm:h-[120px] rounded-[20px] p-[5px] sm:p-[6px] flex items-center justify-center cursor-pointer z-20 transition-all duration-500 group-hover:-translate-y-[12px] border-[1.4px] border-[#D6DADE] group-hover:border-[#818CF8]"
                     style={{
                       backgroundColor: '#F7F7F8',
-                      border: '1.85px solid #D6DADE',
                     }}
                   >
                     <div 
                       className="w-full h-full rounded-[16px] flex items-center justify-center"
                       style={{
+                        backgroundColor: 'rgba(237, 238, 240, 0.85)',
                         border: '1.85px solid rgba(230, 231, 234, 0.5)',
-                        boxShadow: 'inset 0px -3.7px 3.7px rgba(0, 0, 0, 0.25)',
+                        boxShadow: 'inset 0px 3.7px 3.7px rgba(0, 0, 0, 0.18)',
                       }}
                     >
                       <img 
@@ -231,17 +235,17 @@ export default function AboutSection() {
 
                   {/* 4. Postman - Mid Right (77% scale) */}
                   <div 
-                    className="shrink-0 w-[74px] h-[74px] sm:w-[80px] sm:h-[80px] rounded-[18px] p-[4.5px] sm:p-[5px] flex items-center justify-center cursor-pointer"
+                    className="shrink-0 w-[90px] h-[90px] sm:w-[96px] sm:h-[96px] rounded-[20px] p-[5px] flex items-center justify-center cursor-pointer transition-all duration-500 group-hover:delay-75 group-hover:-translate-y-[10px] border-[1.4px] border-[#D6DADE] group-hover:border-[#818CF8]"
                     style={{
                       backgroundColor: '#F7F7F8',
-                      border: '1.85px solid #D6DADE',
                     }}
                   >
                     <div 
-                      className="w-full h-full rounded-[14px] flex items-center justify-center"
+                      className="w-full h-full rounded-[16px] flex items-center justify-center"
                       style={{
+                        backgroundColor: 'rgba(237, 238, 240, 0.85)',
                         border: '1.85px solid rgba(230, 231, 234, 0.5)',
-                        boxShadow: 'inset 0px -3.7px 3.7px rgba(0, 0, 0, 0.25)',
+                        boxShadow: 'inset 0px 3.7px 3.7px rgba(0, 0, 0, 0.18)',
                       }}
                     >
                       <img 
@@ -255,17 +259,17 @@ export default function AboutSection() {
 
                   {/* 5. Spotify - Outer Right (69% scale), exactly 26% opacity to fade out */}
                   <div 
-                    className="shrink-0 w-[66px] h-[66px] sm:w-[72px] sm:h-[72px] rounded-[16px] p-[4px] sm:p-[4.5px] flex items-center justify-center cursor-pointer opacity-[0.26]"
+                    className="shrink-0 w-[82px] h-[82px] sm:w-[88px] sm:h-[88px] rounded-[20px] p-[5px] flex items-center justify-center cursor-pointer opacity-[0.26] transition-all duration-500 group-hover:delay-150 group-hover:-translate-y-[7px] border-[1.4px] border-[#D6DADE] group-hover:border-[#818CF8]"
                     style={{
                       backgroundColor: '#F7F7F8',
-                      border: '1.85px solid #D6DADE',
                     }}
                   >
                     <div 
-                      className="w-full h-full rounded-[12px] flex items-center justify-center"
+                      className="w-full h-full rounded-[16px] flex items-center justify-center"
                       style={{
+                        backgroundColor: 'rgba(237, 238, 240, 0.85)',
                         border: '1.85px solid rgba(230, 231, 234, 0.5)',
-                        boxShadow: 'inset 0px -3.7px 3.7px rgba(0, 0, 0, 0.25)',
+                        boxShadow: 'inset 0px 3.7px 3.7px rgba(0, 0, 0, 0.18)',
                       }}
                     >
                       <img 
@@ -276,7 +280,11 @@ export default function AboutSection() {
                       />
                     </div>
                   </div>
+                </div>
 
+                {/* Hover Arrow */}
+                <div className="absolute bottom-4 right-4 w-8 h-8 rounded-full bg-[#C7D2FE] flex items-center justify-center opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 pointer-events-none">
+                  <ArrowUpRight className="w-5 h-5 text-[#4F46E5]" strokeWidth={2.5} />
                 </div>
               </div>
 
@@ -346,7 +354,9 @@ export default function AboutSection() {
 
                 {/* GitHub */}
                 <a 
-                  href="#" 
+                  href="https://github.com/self-yash" 
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="px-4 py-2 border-b border-[#757575] hover:bg-white transition-colors group flex items-center justify-between"
                 >
                   <div className="flex flex-col justify-center gap-[6px]">
@@ -380,7 +390,9 @@ export default function AboutSection() {
 
                 {/* LinkedIn */}
                 <a 
-                  href="#" 
+                  href="https://www.linkedin.com/in/yashhmehta/" 
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="px-4 py-2 border-r border-[#757575] hover:bg-white transition-colors group flex items-center justify-between"
                 >
                   <div className="flex flex-col justify-center gap-[6px]">
@@ -410,13 +422,21 @@ export default function AboutSection() {
 
                 {/* Monkeytype */}
                 <a 
-                  href="#" 
+                  href="https://monkeytype.com/profile/Festerrr" 
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="px-4 py-2 hover:bg-white transition-colors group flex items-center justify-between"
                 >
-                  <div className="flex flex-col justify-center">
-                    <span className="inline-flex items-center gap-1 text-[#5B5B5B] font-['Geist',sans-serif] font-normal text-[9px] tracking-[0.06em] leading-none mb-[3px]">
+                  <div className="flex flex-col justify-center gap-[6px]">
+                    <span className="inline-flex items-center gap-1.5 text-[#5B5B5B] font-['Geist',sans-serif] font-normal text-[9px] tracking-[0.06em] leading-none h-[9px]">
                       <span>MONKEYTYPE</span>
-                      <Gamepad2 className="w-[11px] h-[11px] text-[#5B5B5B] shrink-0 self-center" strokeWidth={2.5} />
+                      <svg 
+                        viewBox="0 0 24 24" 
+                        fill="currentColor" 
+                        className="w-[11px] h-[11px] text-[#5B5B5B] shrink-0 self-center"
+                      >
+                        <path d="M20 14.4a.8.8 0 1 1 0 1.6a.8.8 0 0 1 0-1.6m-11.2 0h4.8a.8.8 0 1 1 0 1.6H8.8a.8.8 0 1 1 0-1.6M7.2 9.6a.8.8 0 0 1 .8.8V12a.8.8 0 1 1-1.6 0v-1.6a.8.8 0 0 1 .8-.8m-3.999.759A2.4 2.4 0 0 1 7.2 8.612a2.4 2.4 0 0 1 4 1.788V12a.8.8 0 1 1-1.6 0v-1.6a.8.8 0 1 0-1.6 0V12a.8.8 0 1 1-1.6 0v-1.6a.8.8 0 1 0-1.6 0V12a.8.8 0 1 1-1.6 0v-1.6zM17.6 12.8v2.4a.8.8 0 1 1-1.6 0v-2.4h-2.306c-.493 0-.894-.358-.894-.8s.401-.8.894-.8h6.212c.493 0 .894.358.894.8s-.401.8-.894.8zM16.8 8H20a.8.8 0 1 1 0 1.6h-3.2a.8.8 0 1 1 0-1.6M4 14.4h1.6a.8.8 0 1 1 0 1.6H4a.8.8 0 1 1 0-1.6M13.2 8h.4a.8.8 0 1 1 0 1.6h-.4a.8.8 0 1 1 0-1.6M1.6 14.4H0V8.8c0-2.208 1.792-4 4-4h16c2.208 0 4 1.792 4 4v6.4c0 2.208-1.792 4-4 4H4c-2.208 0-4-1.792-4-4v-1.6h1.6v1.6A2.4 2.4 0 0 0 4 17.6h16a2.4 2.4 0 0 0 2.4-2.4V8.8A2.4 2.4 0 0 0 20 6.4H4a2.4 2.4 0 0 0-2.4 2.4z"/>
+                      </svg>
                     </span>
                     <div className="font-['Geist',sans-serif] font-medium text-black text-xs sm:text-[13px] leading-none">
                       @Festerrr
@@ -438,22 +458,54 @@ export default function AboutSection() {
         </div>
 
         {/* Extension of side lines */}
-        <div className="w-full h-6 sm:h-8 md:h-10 bg-transparent"></div>
+        <div className="w-full h-[28px] sm:h-[36px] md:h-[44px] bg-transparent"></div>
       </div>
       
     </div>
       
       {/* Huge Bottom Text (Scrubbed on scroll) */}
-      <div className="relative w-full overflow-hidden whitespace-nowrap mt-6 md:mt-12 mb-16 md:mb-24 flex">
+      <div className="relative w-full overflow-hidden whitespace-nowrap mt-[19px] md:mt-[38px] mb-[51px] md:mb-[77px] flex">
         <motion.div 
           style={{ x }}
-          className="flex whitespace-nowrap text-[12vw] font-['Space_Grotesk',sans-serif] font-medium tracking-tight text-black/90 leading-none"
+          className="flex whitespace-nowrap text-[12vw] font-['Space_Grotesk',sans-serif] font-medium tracking-tight leading-none"
         >
-          {/* Repeat text to ensure it covers the screen during translation */}
-          <span className="shrink-0">BUILT • SHIPPED • BROKEN • FIXED •&nbsp;</span>
-          <span className="shrink-0">BUILT • SHIPPED • BROKEN • FIXED •&nbsp;</span>
-          <span className="shrink-0">BUILT • SHIPPED • BROKEN • FIXED •&nbsp;</span>
-          <span className="shrink-0">BUILT • SHIPPED • BROKEN • FIXED •&nbsp;</span>
+          {/* Alternating filled and stroked text */}
+          <span className="shrink-0 text-black/90">BUILT • SHIPPED • BROKEN • FIXED •&nbsp;</span>
+          <span 
+            className="shrink-0"
+            style={{
+              WebkitTextStroke: '3px #757575',
+              WebkitTextFillColor: 'transparent',
+              color: 'transparent',
+              paintOrder: 'stroke fill'
+            }}
+          >
+            BUILT • SHIPPED • BROKEN • FIXED •&nbsp;
+          </span>
+          <span className="shrink-0 text-black/90">BUILT • SHIPPED • BROKEN • FIXED •&nbsp;</span>
+          <span 
+            className="shrink-0"
+            style={{
+              WebkitTextStroke: '3px #757575',
+              WebkitTextFillColor: 'transparent',
+              color: 'transparent',
+              paintOrder: 'stroke fill'
+            }}
+          >
+            BUILT • SHIPPED • BROKEN • FIXED •&nbsp;
+          </span>
+          <span className="shrink-0 text-black/90">BUILT • SHIPPED • BROKEN • FIXED •&nbsp;</span>
+          <span 
+            className="shrink-0"
+            style={{
+              WebkitTextStroke: '3px #757575',
+              WebkitTextFillColor: 'transparent',
+              color: 'transparent',
+              paintOrder: 'stroke fill'
+            }}
+          >
+            BUILT • SHIPPED • BROKEN • FIXED •&nbsp;
+          </span>
         </motion.div>
       </div>
     </section>
