@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import coverFileImg from '../assets/images/cover_file.png';
 import landingPageImg from '../assets/images/landing_page.png';
 
 export default function ProjectsSection() {
@@ -206,7 +207,7 @@ export default function ProjectsSection() {
                 {/* Project Mockup Showcase Image */}
                 <div className="relative w-full aspect-video overflow-hidden bg-[#0A1F6E]">
                   <img 
-                    src="/cover_file.png" 
+                    src={coverFileImg} 
                     alt="Sports ERP Platform Showcase" 
                     className="w-full h-full object-cover object-center"
                     loading="lazy"
