@@ -1,15 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <rect width="64" height="64" rx="16" fill="#050608"/>
-  <rect x="0.75" y="0.75" width="62.5" height="62.5" rx="15.25" stroke="#262833" stroke-width="1.5"/>
-  <defs>
-    <linearGradient id="ymGrad" x1="14" y1="14" x2="50" y2="50" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#4596DD"/>
-      <stop offset="1" stop-color="#00D2B4"/>
-    </linearGradient>
-  </defs>
-  <!-- Stylized Y -->
-  <path d="M16 19L25.5 32V45" stroke="url(#ymGrad)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M35 19L25.5 32" stroke="url(#ymGrad)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- Stylized M -->
-  <path d="M35 45V27L42 36L49 27V45" stroke="#FFFFFF" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <!-- YM in Giordani Registry font, color #1F9CF0, transparent background -->
+  <path d="M35.43 67.86C35.43 66.80 35.78 65.49 36.22 64.61L49.65 38.54C52.28 33.36 59.74 34.15 60.71 34.15L60.71 33.27L41.92 33.27L41.92 34.15C42.89 34.15 51.41 33.27 48.68 38.54L35.78 63.73C35.34 64.61 34.64 64.61 34.20 63.73L19.89 35.91C19.28 34.76 19.80 34.15 20.86 34.15L24.10 34.15L24.10 33.27L4 33.27L4 34.15L7.25 34.15C8.30 34.15 9.27 34.76 9.88 35.91L25.86 66.63C26.30 67.51 26.65 68.82 26.65 69.88L26.65 92.09C26.65 93.14 25.95 93.84 24.89 93.84L21.65 93.84L21.65 94.72L40.43 94.72L40.43 93.84L37.18 93.84C36.13 93.84 35.43 93.14 35.43 92.09M95.56 84.80C95.30 85.85 94.86 85.77 94.51 84.80L76.77 33.27L59.04 33.27L59.04 34.15C60.01 34.15 68 33.27 68 38.54L68 89.45C68 94.72 60.01 93.84 59.04 93.84L59.04 94.72L77.83 94.72L77.83 93.84C76.86 93.84 68.87 94.72 68.87 89.45L68.87 38.63C68.87 37.57 69.14 37.57 69.49 38.54L88.71 94.72L93.72 94.72L109.52 38.28C109.78 37.22 109.96 37.31 109.96 38.36L109.96 92.09C109.96 93.14 109.25 93.84 108.11 93.84L104.69 93.84L104.69 94.72L124 94.72L124 93.84L120.58 93.84C119.44 93.84 118.74 93.14 118.74 92.09L118.74 35.91C118.74 34.85 119.44 34.15 120.58 34.15L124 34.15L124 33.27L109.96 33.27L109.96 33.36" fill="#1F9CF0" />
 </svg>
