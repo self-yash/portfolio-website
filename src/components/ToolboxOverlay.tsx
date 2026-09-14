@@ -110,11 +110,11 @@ export const ToolboxOverlay: React.FC<ToolboxOverlayProps> = ({ isOpen, onClose 
 
           {/* Modal Container: Matching the exact width of About Bento cards (1050px) */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 12 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 12 }}
-            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="relative z-10 w-full max-w-[1050px] bg-[#F3F2F6] rounded-[24px] sm:rounded-[28px] border border-[#DCDCE2] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5)] flex flex-col my-auto shrink-0 select-none overflow-hidden"
+            initial={{ y: '100vh', opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: '100vh', opacity: 0 }}
+            transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
+            className="relative z-10 w-full max-w-[1050px] bg-[#F7F7F8] rounded-[24px] sm:rounded-[28px] border border-[#DCDCE2] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5)] flex flex-col my-auto shrink-0 select-none overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
@@ -198,6 +198,8 @@ export const ToolboxOverlay: React.FC<ToolboxOverlayProps> = ({ isOpen, onClose 
                             src={tool.icon}
                             alt={tool.name}
                             className="w-9 h-9 sm:w-10 sm:h-10 object-contain select-none"
+                            loading="eager"
+                            decoding="sync"
                             referrerPolicy="no-referrer"
                           />
                         </div>
@@ -211,8 +213,8 @@ export const ToolboxOverlay: React.FC<ToolboxOverlayProps> = ({ isOpen, onClose 
                   ))}
                 </div>
 
-                {/* Row 2: 5 Apps */}
-                <div className="flex justify-center gap-4 sm:gap-6 md:gap-8 lg:gap-10 items-start w-full">
+                {/* Row 2: 5 Apps - Increased gap to match Row 1 */}
+                <div className="flex justify-center gap-5 sm:gap-7 md:gap-11 lg:gap-14 xl:gap-16 items-start w-full">
                   {row2Tools.map((tool) => (
                     <div
                       key={tool.name}
@@ -238,6 +240,8 @@ export const ToolboxOverlay: React.FC<ToolboxOverlayProps> = ({ isOpen, onClose 
                             src={tool.icon}
                             alt={tool.name}
                             className="w-9 h-9 sm:w-10 sm:h-10 object-contain select-none"
+                            loading="eager"
+                            decoding="sync"
                             referrerPolicy="no-referrer"
                           />
                         </div>
@@ -269,51 +273,55 @@ export const ToolboxOverlay: React.FC<ToolboxOverlayProps> = ({ isOpen, onClose 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4 items-stretch">
                   {/* Left: System Specs Card */}
                   <div className="bg-[#F8F8FA] rounded-[14px] sm:rounded-[16px] border border-[#DCE0E6] p-4 sm:p-5 shadow-[0_1px_4px_rgba(0,0,0,0.02)] flex flex-col justify-between">
-                    <h3 className="text-[14px] sm:text-[15px] font-['Geist',sans-serif] font-medium text-black text-center pb-4 border-b border-[#E4E4EC] mb-4">
+                    <h3 className="text-[14px] sm:text-[15px] font-['Geist',sans-serif] font-medium text-black text-center pb-4 border-b border-[#E4E4EC] mb-6 sm:mb-7">
                       System
                     </h3>
 
-                    <div className="flex flex-col space-y-3.5 sm:space-y-4 my-auto">
-                      {systemSpecs.map((spec) => (
-                        <div key={spec.label} className="flex items-start justify-between gap-4 sm:gap-6">
-                          <span className="w-20 sm:w-24 text-[11.5px] sm:text-[12.5px] font-['Geist',sans-serif] font-normal text-black shrink-0">
-                            {spec.label}
-                          </span>
-                          <span className="text-[11.5px] sm:text-[12.5px] font-['Geist',sans-serif] text-[#757575] font-normal leading-snug text-right sm:text-left flex-1">
-                            {spec.value}
-                          </span>
-                        </div>
-                      ))}
+                    <div className="flex flex-col space-y-5 sm:space-y-[22px] my-auto">
+                      {systemSpecs.map((spec) => {
+                        const isGPU = spec.label === 'GPU';
+                        return (
+                          <div key={spec.label} className="flex items-start justify-between gap-4 sm:gap-6">
+                            <span className={`w-24 sm:w-28 text-[13.5px] sm:text-[14.5px] font-['Geist',sans-serif] font-normal shrink-0 ${isGPU ? 'line-through text-[#757575]' : 'text-black'}`}>
+                              {spec.label}
+                            </span>
+                            <span className={`text-[13.5px] sm:text-[14.5px] font-['Geist',sans-serif] font-normal leading-snug text-right sm:text-left flex-1 ${isGPU ? 'line-through text-[#757575]' : 'text-[#757575]'}`}>
+                              {spec.value}
+                            </span>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
 
                   {/* Right: Accessories Cards */}
-                  <div className="flex flex-col gap-3 sm:gap-3.5">
-                    {/* Accessories Header Pill */}
-                    <div className="bg-[#F8F8FA] rounded-[12px] sm:rounded-[14px] border border-[#DCE0E6] py-2.5 px-4 flex items-center justify-center shadow-[0_1px_4px_rgba(0,0,0,0.02)]">
+                  <div className="flex flex-col justify-between gap-2.5 sm:gap-3 h-full">
+                    {/* Accessories Header Pill: rounded top, sharp bottom */}
+                    <div className="bg-[#F8F8FA] rounded-t-[12px] sm:rounded-t-[14px] rounded-b-none border border-[#DCE0E6] flex-1 min-h-[48px] sm:min-h-[54px] px-4 flex items-center justify-center shadow-[0_1px_4px_rgba(0,0,0,0.02)] transition-colors duration-200 hover:border-[#818CF8] hover:shadow-none cursor-default">
                       <h3 className="text-[13.5px] sm:text-[14.5px] font-['Geist',sans-serif] font-medium text-black">
                         Accessories
                       </h3>
                     </div>
 
-                    {/* Logitech Mouse Card */}
-                    <div className="bg-[#F8F8FA] rounded-[14px] sm:rounded-[16px] border border-[#DCE0E6] p-3.5 sm:p-4 shadow-[0_1px_4px_rgba(0,0,0,0.02)] flex flex-col items-center text-center">
-                      <h4 className="text-[13px] sm:text-[13.5px] font-['Geist',sans-serif] font-medium text-black mb-1.5">
+                    {/* Logitech Mouse Card: all sharp corners */}
+                    <div className="bg-[#F8F8FA] rounded-none border border-[#DCE0E6] flex-1 min-h-[48px] sm:min-h-[54px] px-4 flex items-center justify-center shadow-[0_1px_4px_rgba(0,0,0,0.02)] transition-colors duration-200 hover:border-[#818CF8] hover:shadow-none cursor-default text-center">
+                      <h4 className="text-[13px] sm:text-[14px] font-['Geist',sans-serif] font-medium text-black">
                         Logitech G102 Lightsync
                       </h4>
-                      <p className="text-[11px] sm:text-[12px] font-['Geist',sans-serif] text-[#757575] font-normal leading-[1.6]">
-                        With a matte black finish, this 6-button wired gaming mouse has an 8,000 DPI gaming-grade sensor topped with customizable LIGHTSYNC RGB lighting.
-                      </p>
                     </div>
 
-                    {/* boAt Headset Card */}
-                    <div className="bg-[#F8F8FA] rounded-[14px] sm:rounded-[16px] border border-[#DCE0E6] p-3.5 sm:p-4 shadow-[0_1px_4px_rgba(0,0,0,0.02)] flex flex-col items-center text-center">
-                      <h4 className="text-[13px] sm:text-[13.5px] font-['Geist',sans-serif] font-medium text-black mb-1.5">
+                    {/* boAt Headset Card: all sharp corners */}
+                    <div className="bg-[#F8F8FA] rounded-none border border-[#DCE0E6] flex-1 min-h-[48px] sm:min-h-[54px] px-4 flex items-center justify-center shadow-[0_1px_4px_rgba(0,0,0,0.02)] transition-colors duration-200 hover:border-[#818CF8] hover:shadow-none cursor-default text-center">
+                      <h4 className="text-[13px] sm:text-[14px] font-['Geist',sans-serif] font-medium text-black">
                         boAt Rockerz Prime 415
                       </h4>
-                      <p className="text-[11px] sm:text-[12px] font-['Geist',sans-serif] text-[#757575] font-normal leading-[1.6]">
-                        This over-ear wireless headset has 40mm dynamic drivers topped with immersive 360° Spatial Audio and a massive 120-hour battery life.
-                      </p>
+                    </div>
+
+                    {/* realme Buds 2 Card: sharp top, rounded bottom */}
+                    <div className="bg-[#F8F8FA] rounded-t-none rounded-b-[14px] sm:rounded-b-[16px] border border-[#DCE0E6] flex-1 min-h-[48px] sm:min-h-[54px] px-4 flex items-center justify-center shadow-[0_1px_4px_rgba(0,0,0,0.02)] transition-colors duration-200 hover:border-[#818CF8] hover:shadow-none cursor-default text-center">
+                      <h4 className="text-[13px] sm:text-[14px] font-['Geist',sans-serif] font-medium text-black">
+                        realme Buds 2
+                      </h4>
                     </div>
                   </div>
 

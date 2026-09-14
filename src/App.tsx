@@ -12,8 +12,22 @@ import Lenis from 'lenis';
 import Snap from 'lenis/snap';
 
 export default function App() {
-  const words = ["Backend Developer", "Designer", "Music fanboy", "Games Nerd"];
-  const [text, setText] = useState("Backend Developer");
+  const [isPhone, setIsPhone] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const checkPhone = () => setIsPhone(window.innerWidth < 640);
+      checkPhone();
+      window.addEventListener('resize', checkPhone);
+      return () => window.removeEventListener('resize', checkPhone);
+    }
+  }, []);
+
+  const words = isPhone 
+    ? ["Backend Dev", "Designer", "Music fanboy", "Games Nerd"]
+    : ["Backend Developer", "Designer", "Music fanboy", "Games Nerd"];
+
+  const [text, setText] = useState(typeof window !== 'undefined' && window.innerWidth < 640 ? "Backend Dev" : "Backend Developer");
   const [isDeleting, setIsDeleting] = useState(false);
   const [wordIndex, setWordIndex] = useState(0);
 
@@ -245,7 +259,7 @@ export default function App() {
   });
 
   useEffect(() => {
-    const currentWord = words[wordIndex];
+    const currentWord = words[wordIndex] || (isPhone ? "Backend Dev" : "Backend Developer");
     let timer: NodeJS.Timeout;
 
     if (isDeleting) {
@@ -266,7 +280,7 @@ export default function App() {
       }
     }
     return () => clearTimeout(timer);
-  }, [text, isDeleting, wordIndex]);
+  }, [text, isDeleting, wordIndex, words, isPhone]);
 
   return (
     <div className="relative w-full min-h-screen bg-black text-white font-sans selection:bg-blue-500/30 overflow-x-clip">
@@ -402,7 +416,9 @@ export default function App() {
                   </span>
                   <span className="whitespace-nowrap flex items-baseline min-h-[1.2em]">
                     <span className="text-[#FFFFFF] mr-3 md:mr-4 lg:mr-5">a </span>
-                    <span className="text-[#4596DD] font-['Cal_Sans',sans-serif] font-semibold">{text}{"\u200B"}</span>
+                    <span className="text-[#4596DD] font-['Cal_Sans',sans-serif] font-semibold">
+                      {isPhone ? text.replace("Backend Developer", "Backend Dev") : text}{"\u200B"}
+                    </span>
                     <motion.span 
                       className="inline-block bg-gradient-to-b from-[#00C8B3] to-[#0088FF] text-transparent bg-clip-text font-medium ml-1 select-none"
                       style={{ scaleY: 1.18, transformOrigin: 'center' }}

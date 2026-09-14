@@ -92,7 +92,7 @@ export default function AboutSection({
                   Good Afternoon!<br/>
                   I'm Yash Mehta, a final year student at<br/>
                   Sir Padampat Singhania University,<br/>
-                  Udaipur experienced at
+                  Udaipur
                 </div>
               </div>
 
