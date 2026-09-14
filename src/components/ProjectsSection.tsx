@@ -5,13 +5,14 @@ import landingPageImg from '../assets/images/landing_page.png';
 
 export default function ProjectsSection() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const marqueeRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
-    target: containerRef,
+    target: marqueeRef,
     offset: ["start end", "end start"]
   });
   
-  // Scrolls left-to-right on scroll (starts left, moves right)
-  const x = useTransform(scrollYProgress, [0, 1], ["-20%", "5%"]);
+  // Natively on the left (scrolls from -100% to -20% as user scrolls)
+  const x = useTransform(scrollYProgress, [0, 1], ["-100%", "-20%"]);
 
   return (
     <div ref={containerRef} id="projects" className="relative w-full border-t border-[#757575] bg-[#E5E5E5] text-black">
@@ -558,50 +559,49 @@ export default function ProjectsSection() {
       </div>
       
       {/* Left-to-Right Scrolling Marquee for Tech Stack (Scroll-Linked) - Full Width */}
-      <div className="relative w-full overflow-hidden whitespace-nowrap pt-2 pb-16 md:pb-24 flex items-center justify-center border-b border-[#757575] bg-[#E5E5E5]">
+      <div 
+        ref={marqueeRef}
+        className="relative w-full overflow-hidden whitespace-nowrap pt-2 pb-16 md:pb-24 flex items-center justify-start border-b border-[#757575] bg-[#E5E5E5]"
+      >
         <motion.div 
           className="flex items-center gap-6 md:gap-10 w-max"
           style={{ x }}
         >
-          {[...Array(4)].map((_, i) => (
-            <React.Fragment key={i}>
-              {/* Sequence 1: All Grey */}
-              {[
-                { text: "PYTHON", color: "#757575" },
-                { text: "GIT", color: "#757575" },
-                { text: "MONGO", color: "#757575" },
-              ].map((item, index) => (
-                <React.Fragment key={`grey-${i}-${index}`}>
-                  <span 
-                    className="text-[12vw] font-['Space_Grotesk',sans-serif] font-medium tracking-normal leading-none"
-                    style={{ WebkitTextStroke: `2.5px ${item.color}`, WebkitTextFillColor: 'transparent', color: 'transparent', paintOrder: 'stroke fill' }}
-                  >
-                    {item.text}
-                  </span>
-                  <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-[13vw] h-[13vw] max-w-[125px] max-h-[125px] mx-1 md:mx-4 shrink-0" style={{ stroke: item.color, strokeWidth: '4.5px' }}>
-                    <path d="M50 0C50 35 65 50 100 50C65 50 50 65 50 100C50 65 35 50 0 50C35 50 50 35 50 0Z" />
-                  </svg>
-                </React.Fragment>
-              ))}
+          {/* Sequence 1: Indigo Set (1 time) */}
+          {[
+            { text: "MONGO", color: "#4F46E5" },
+            { text: "PYTHON", color: "#4F46E5" },
+            { text: "GIT", color: "#4F46E5" },
+          ].map((item, index) => (
+            <React.Fragment key={`blue-${index}`}>
+              <span 
+                className="text-[12vw] font-['Space_Grotesk',sans-serif] font-medium tracking-normal leading-none"
+                style={{ WebkitTextStroke: `2.5px ${item.color}`, WebkitTextFillColor: 'transparent', color: 'transparent', paintOrder: 'stroke fill' }}
+              >
+                {item.text}
+              </span>
+              <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-[13vw] h-[13vw] max-w-[125px] max-h-[125px] mx-1 md:mx-4 shrink-0" style={{ stroke: item.color, strokeWidth: '4.5px' }}>
+                <path d="M50 0C50 35 65 50 100 50C65 50 50 65 50 100C50 65 35 50 0 50C35 50 50 35 50 0Z" />
+              </svg>
+            </React.Fragment>
+          ))}
 
-              {/* Sequence 2: All Blue */}
-              {[
-                { text: "PYTHON", color: "#4F46E5" },
-                { text: "GIT", color: "#4F46E5" },
-                { text: "MONGO", color: "#4F46E5" },
-              ].map((item, index) => (
-                <React.Fragment key={`blue-${i}-${index}`}>
-                  <span 
-                    className="text-[12vw] font-['Space_Grotesk',sans-serif] font-medium tracking-normal leading-none"
-                    style={{ WebkitTextStroke: `2.5px ${item.color}`, WebkitTextFillColor: 'transparent', color: 'transparent', paintOrder: 'stroke fill' }}
-                  >
-                    {item.text}
-                  </span>
-                  <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-[13vw] h-[13vw] max-w-[125px] max-h-[125px] mx-1 md:mx-4 shrink-0" style={{ stroke: item.color, strokeWidth: '4.5px' }}>
-                    <path d="M50 0C50 35 65 50 100 50C65 50 50 65 50 100C50 65 35 50 0 50C35 50 50 35 50 0Z" />
-                  </svg>
-                </React.Fragment>
-              ))}
+          {/* Sequence 2: Grey Set (1 time) */}
+          {[
+            { text: "MONGO", color: "#757575" },
+            { text: "PYTHON", color: "#757575" },
+            { text: "GIT", color: "#757575" },
+          ].map((item, index) => (
+            <React.Fragment key={`grey-${index}`}>
+              <span 
+                className="text-[12vw] font-['Space_Grotesk',sans-serif] font-medium tracking-normal leading-none"
+                style={{ WebkitTextStroke: `2.5px ${item.color}`, WebkitTextFillColor: 'transparent', color: 'transparent', paintOrder: 'stroke fill' }}
+              >
+                {item.text}
+              </span>
+              <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-[13vw] h-[13vw] max-w-[125px] max-h-[125px] mx-1 md:mx-4 shrink-0" style={{ stroke: item.color, strokeWidth: '4.5px' }}>
+                <path d="M50 0C50 35 65 50 100 50C65 50 50 65 50 100C50 65 35 50 0 50C35 50 50 35 50 0Z" />
+              </svg>
             </React.Fragment>
           ))}
         </motion.div>
