@@ -1,22 +1,38 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowUpRight, Code2, Music, Video, Gamepad2, Send, PenTool, Terminal, Globe, Network, MessageSquare } from 'lucide-react';
 import ProjectsSection from './ProjectsSection';
 import StackSection from './StackSection';
 import FooterSection from './FooterSection';
+import { ToolboxOverlay } from './ToolboxOverlay';
+import fh6Img from '../assets/images/fh6.jpg';
+import genshinImg from '../assets/images/GenshinImpact.jpg';
+import valorantImg from '../assets/images/valorant.jpg';
+import tlouImg from '../assets/images/tlou.jpg';
 
-export default function AboutSection() {
-  const containerRef = useRef<HTMLElement>(null);
+interface AboutSectionProps {
+  isToolboxOpen?: boolean;
+  setIsToolboxOpen?: (open: boolean) => void;
+}
+
+export default function AboutSection({
+  isToolboxOpen: externalIsToolboxOpen,
+  setIsToolboxOpen: externalSetIsToolboxOpen,
+}: AboutSectionProps = {}) {
+  const [internalIsToolboxOpen, setInternalIsToolboxOpen] = useState(false);
+  const isToolboxOpen = externalIsToolboxOpen !== undefined ? externalIsToolboxOpen : internalIsToolboxOpen;
+  const setIsToolboxOpen = externalSetIsToolboxOpen || setInternalIsToolboxOpen;
+  const tickerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
-    target: containerRef,
+    target: tickerRef,
     offset: ["start end", "end start"]
   });
   
-  // Moves from right to left as we scroll down, starting at 0%
-  const x = useTransform(scrollYProgress, [0, 1], ["0%", "-50%"]);
+  // Starts blank with text offscreen to the right at 100vw, scrolls in and moves across to the left
+  const x = useTransform(scrollYProgress, [0, 1], ["100vw", "-260vw"]);
 
   return (
-    <section ref={containerRef} id="about" className="relative w-full min-h-screen bg-[#E5E5E5] text-black pt-0 overflow-hidden selection:bg-blue-500/30">
+    <section id="about" className="relative w-full min-h-screen bg-[#E5E5E5] text-black pt-0 overflow-hidden selection:bg-blue-500/30">
       
       {/* Wrapper that cuts off the diagonal background and creates the full-width horizontal line */}
       <div className="relative w-full border-b border-[#757575]">
@@ -89,55 +105,55 @@ export default function AboutSection() {
                   A collection of games I enjoy, replay, and occasionally get way too competitive about.
                 </p>
                 
-                {/* Stacked Game Cards Visual - Reduced spacing between cards, Genshin 5th, TLOU 4th, Valorant 3rd, Forza 2nd, Cyberpunk front */}
+                {/* Stacked Game Cards Visual: 5th Cyberpunk (backmost), 4th TLOU, 3rd Valorant, 2nd Genshin, 1st FH6 (frontmost) */}
                 <div className="absolute right-2 sm:right-4 md:right-6 top-1/2 -translate-y-1/2 flex items-center justify-end pointer-events-none">
                   <div className="relative flex items-center h-40 sm:h-44 lg:h-48 w-40 sm:w-48 lg:w-[250px] justify-end">
                     
-                    {/* Card 1: Genshin Impact (5th image) */}
-                    <div className="absolute right-12 sm:right-15 lg:right-[72px] w-24 sm:w-28 lg:w-[114px] h-36 sm:h-40 lg:h-44 rounded-2xl overflow-hidden border border-black/10 bg-white flex flex-col justify-between shadow-sm z-[1]">
+                    {/* Card 5: Cyberpunk 2077 (5th image, furthest back z-[1]) */}
+                    <div className="absolute right-12 sm:right-15 lg:right-[72px] w-24 sm:w-28 lg:w-[114px] h-36 sm:h-40 lg:h-44 rounded-2xl overflow-hidden border border-black/10 shadow-sm z-[1] bg-[#FCE100]">
                       <img 
-                        src="/images/genshin.jpg" 
-                        alt="Genshin Impact" 
+                        src="/images/cyberpunk.jpg" 
+                        alt="Cyberpunk 2077" 
                         className="w-full h-full object-cover object-center"
                         referrerPolicy="no-referrer"
                       />
                     </div>
 
-                    {/* Card 2: The Last of Us Part I (4th image) */}
+                    {/* Card 4: The Last of Us Part I (4th image z-[2]) */}
                     <div className="absolute right-9 sm:right-11 lg:right-[54px] w-24 sm:w-28 lg:w-[114px] h-36 sm:h-40 lg:h-44 rounded-2xl overflow-hidden border border-black/10 shadow-sm z-[2] bg-black">
                       <img 
-                        src="/images/tlou.jpg" 
+                        src={tlouImg} 
                         alt="The Last of Us Part I" 
                         className="w-full h-full object-cover object-center"
                         referrerPolicy="no-referrer"
                       />
                     </div>
 
-                    {/* Card 3: Valorant Key Art Poster (3rd image) */}
+                    {/* Card 3: Valorant Key Art Poster (3rd image z-[3]) */}
                     <div className="absolute right-6 sm:right-7.5 lg:right-[36px] w-24 sm:w-28 lg:w-[114px] h-36 sm:h-40 lg:h-44 rounded-2xl overflow-hidden border border-black/10 shadow-sm z-[3] bg-[#E8333D]">
                       <img 
-                        src="/images/valorant.jpg" 
+                        src={valorantImg} 
                         alt="Valorant" 
                         className="w-full h-full object-cover object-center"
                         referrerPolicy="no-referrer"
                       />
                     </div>
 
-                    {/* Card 4: Official Forza Horizon 6 Poster (2nd image) */}
+                    {/* Card 2: Genshin Impact (2nd image z-[4]) */}
                     <div className="absolute right-3 sm:right-4 lg:right-[18px] w-24 sm:w-28 lg:w-[114px] h-36 sm:h-40 lg:h-44 rounded-2xl overflow-hidden border border-black/10 shadow-sm z-[4] bg-white">
                       <img 
-                        src="/images/forza.jpg" 
-                        alt="Forza Horizon 6" 
+                        src={genshinImg} 
+                        alt="Genshin Impact" 
                         className="w-full h-full object-cover object-center"
                         referrerPolicy="no-referrer"
                       />
                     </div>
 
-                    {/* Card 5 (Front): Cyberpunk 2077 Official Poster */}
-                    <div className="absolute right-0 w-24 sm:w-28 lg:w-[114px] h-36 sm:h-40 lg:h-44 rounded-2xl shadow-[0_10px_24px_rgba(0,0,0,0.25)] border border-white/40 overflow-hidden z-[5] bg-[#FCE100]">
+                    {/* Card 1 (Frontmost): Forza Horizon 6 (1st image z-[5]) */}
+                    <div className="absolute right-0 w-24 sm:w-28 lg:w-[114px] h-36 sm:h-40 lg:h-44 rounded-2xl shadow-[0_10px_24px_rgba(0,0,0,0.25)] border border-white/40 overflow-hidden z-[5] bg-white">
                       <img 
-                        src="/images/cyberpunk.jpg" 
-                        alt="Cyberpunk 2077" 
+                        src={fh6Img} 
+                        alt="Forza Horizon 6" 
                         className="w-full h-full object-cover object-center"
                         referrerPolicy="no-referrer"
                       />
@@ -153,7 +169,10 @@ export default function AboutSection() {
             <div className="flex flex-col gap-3">
               
               {/* Toolbox Card - Reduced length: 240px with crisp #757575 border, 18px radius, more breathing space, no hover effect */}
-              <div className="bg-[#F8F8F9] rounded-[18px] p-5 md:p-6 border border-[#757575] flex flex-col items-center justify-center overflow-hidden relative h-auto min-h-[210px] lg:h-[240px] group cursor-pointer">
+              <div 
+                onClick={() => setIsToolboxOpen(true)}
+                className="bg-[#F8F8F9] rounded-[18px] p-5 md:p-6 border border-[#757575] flex flex-col items-center justify-center overflow-hidden relative h-auto min-h-[210px] lg:h-[240px] group cursor-pointer"
+              >
                 <h3 className="text-[16px] font-['Geist',sans-serif] font-medium text-black mb-1.5 z-10 text-center">
                   Toolbox
                 </h3>
@@ -466,14 +485,18 @@ export default function AboutSection() {
       
     </div>
       
-      {/* Huge Bottom Text (Scrubbed on scroll, vertically centered between top and bottom border lines) */}
-      <div className="relative w-full overflow-hidden whitespace-nowrap py-7 sm:py-9 md:py-12 flex items-center justify-center">
+      {/* Huge Bottom Text (Scrubbed on scroll, starts blank, single filled sequence then stroked sequence, non-looping) */}
+      <div 
+        ref={tickerRef} 
+        className="relative w-full overflow-hidden whitespace-nowrap py-7 sm:py-9 md:py-12 flex items-center justify-start select-none pointer-events-none"
+      >
         <motion.div 
           style={{ x }}
-          className="flex whitespace-nowrap text-[12vw] font-['Space_Grotesk',sans-serif] font-medium tracking-tight leading-none"
+          className="flex whitespace-nowrap text-[12vw] font-['Space_Grotesk',sans-serif] font-medium tracking-tight leading-none will-change-transform"
         >
-          {/* Alternating filled and stroked text */}
+          {/* 1. Filled Sequence */}
           <span className="shrink-0 text-black/90">BUILT • SHIPPED • BROKEN • FIXED •&nbsp;</span>
+          {/* 2. Stroked Sequence */}
           <span 
             className="shrink-0"
             style={{
@@ -483,31 +506,7 @@ export default function AboutSection() {
               paintOrder: 'stroke fill'
             }}
           >
-            BUILT • SHIPPED • BROKEN • FIXED •&nbsp;
-          </span>
-          <span className="shrink-0 text-black/90">BUILT • SHIPPED • BROKEN • FIXED •&nbsp;</span>
-          <span 
-            className="shrink-0"
-            style={{
-              WebkitTextStroke: '3px #757575',
-              WebkitTextFillColor: 'transparent',
-              color: 'transparent',
-              paintOrder: 'stroke fill'
-            }}
-          >
-            BUILT • SHIPPED • BROKEN • FIXED •&nbsp;
-          </span>
-          <span className="shrink-0 text-black/90">BUILT • SHIPPED • BROKEN • FIXED •&nbsp;</span>
-          <span 
-            className="shrink-0"
-            style={{
-              WebkitTextStroke: '3px #757575',
-              WebkitTextFillColor: 'transparent',
-              color: 'transparent',
-              paintOrder: 'stroke fill'
-            }}
-          >
-            BUILT • SHIPPED • BROKEN • FIXED •&nbsp;
+            BUILT • SHIPPED • BROKEN • FIXED
           </span>
         </motion.div>
       </div>
@@ -520,6 +519,9 @@ export default function AboutSection() {
 
       {/* Footer Section */}
       <FooterSection />
+
+      {/* Toolbox Overlay Modal */}
+      <ToolboxOverlay isOpen={isToolboxOpen} onClose={() => setIsToolboxOpen(false)} />
     </section>
   );
 }

@@ -22,10 +22,27 @@ function SkillBar({ name, sub, value, isCyan, delay = 0 }: { name: string, sub?:
               {sub.includes("Platinum 2") ? (
                 <span className="relative group/peak inline-flex items-center ml-1 cursor-default">
                   <span className="text-[#757575]/80 font-normal">{sub}</span>
-                  {/* Tooltip pop matching reference with #242429 and no shadow */}
+                  {/* Tooltip pop matching reference with #242429 and smooth rounded arrow */}
                   <span className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-[8px] bg-[#242429] border border-white/10 text-white text-[12.5px] font-['Geist',sans-serif] font-medium opacity-0 group-hover/peak:opacity-100 group-hover/peak:-translate-y-1 transition-all duration-200 pointer-events-none z-30 whitespace-nowrap flex items-center justify-center">
                     Peak
-                    <span className="absolute -bottom-[5px] left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-[#242429] rotate-45 border-r border-b border-white/10" />
+                    <svg 
+                      className="absolute -bottom-[5.5px] left-1/2 -translate-x-1/2 overflow-visible" 
+                      width="12" 
+                      height="6" 
+                      viewBox="0 0 12 6"
+                      fill="none"
+                    >
+                      <path 
+                        d="M0 0 L4.6 4.6 C5.4 5.4 6.6 5.4 7.4 4.6 L12 0 Z" 
+                        fill="#242429" 
+                      />
+                      <path 
+                        d="M0 0 L4.6 4.6 C5.4 5.4 6.6 5.4 7.4 4.6 L12 0" 
+                        stroke="rgba(255, 255, 255, 0.1)" 
+                        strokeWidth="1" 
+                        strokeLinecap="round" 
+                      />
+                    </svg>
                   </span>
                 </span>
               ) : (
@@ -44,7 +61,8 @@ function SkillBar({ name, sub, value, isCyan, delay = 0 }: { name: string, sub?:
           whileInView={{ width: `${value}%` }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 1, ease: "easeOut", delay: delay + 0.2 }}
-          className={`h-full ${isCyan ? 'bg-[#22d3ee]' : 'bg-[#4F46E5]'}`}
+          className="h-full"
+          style={{ backgroundColor: isCyan ? 'rgba(82, 210, 222, 0.86)' : '#4F46E5' }}
         />
       </div>
     </motion.div>
@@ -180,7 +198,7 @@ export default function StackSection() {
             />
             <CategoryCard 
               title="DATABASE" 
-              tags={["Firebase", "MySQL"]} 
+              tags={["Firebase", "MySQL", "MongoDB"]} 
               delay={0.4}
             />
           </div>

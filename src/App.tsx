@@ -20,6 +20,7 @@ export default function App() {
   const { scrollY } = useScroll();
   const [windowHeight, setWindowHeight] = useState(800);
   const [showAboutNavbar, setShowAboutNavbar] = useState(false);
+  const [isToolboxOpen, setIsToolboxOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<'home' | 'about' | 'projects' | 'stack'>('home');
   const aboutRef = useRef<HTMLDivElement>(null);
   const lenisRef = useRef<Lenis | null>(null);
@@ -159,6 +160,9 @@ export default function App() {
       smoothWheel: true,
     });
     lenisRef.current = lenis;
+    if (typeof window !== 'undefined') {
+      (window as any).__lenis = lenis;
+    }
 
     const snap = new Snap(lenis, {
       type: 'proximity',
@@ -299,7 +303,7 @@ export default function App() {
           <nav className="absolute top-0 left-0 w-full z-20 flex items-center justify-between px-8 py-6 md:px-16 md:py-8">
             <div 
               onClick={scrollToHome}
-              className="text-lg md:text-xl lg:text-[22px] font-['Giordani_Registry','GIORDANI_Registry',serif] tracking-normal uppercase flex-1 cursor-pointer select-none transition-opacity hover:opacity-80 leading-none"
+              className="text-[16px] md:text-[18px] lg:text-[20px] font-['Giordani_Registry','GIORDANI_Registry',serif] tracking-normal uppercase flex-1 cursor-pointer select-none transition-opacity hover:opacity-80 leading-none"
             >
               Yash Mehta
             </div>
@@ -415,7 +419,7 @@ export default function App() {
                     I build things, explore weird ideas, and occasionally make the internet a little more interesting.
                   </p>
                   <p>
-                    I like making things that work. Most Known For <a href="#" className="text-[#FFFFFF] opacity-100 underline decoration-[#1F9CF0] hover:bg-[#1F9CF0] hover:text-black hover:no-underline transition-all duration-300 underline-offset-4 font-medium px-1 -mx-1 rounded">HandFlow.</a>
+                    I like making things that work. Most Known For <a href="https://github.com/Self-nasu/HandFlow" target="_blank" rel="noopener noreferrer" className="text-[#FFFFFF] opacity-100 underline decoration-[#1F9CF0] hover:bg-[#1F9CF0] hover:text-black hover:no-underline transition-all duration-300 underline-offset-4 font-medium px-1 -mx-1 rounded">HandFlow.</a>
                   </p>
                 </div>
               </div>
@@ -444,12 +448,12 @@ export default function App() {
 
       {/* About Section (Slides up over hero on scroll) */}
       <div ref={aboutRef} className="relative z-10 w-full shadow-[0_-15px_35px_rgba(0,0,0,0.28)]">
-        <AboutSection />
+        <AboutSection isToolboxOpen={isToolboxOpen} setIsToolboxOpen={setIsToolboxOpen} />
       </div>
 
-      {/* Floating Navbar (exact same glass pill as hero) that animates in from top center after 1.5-second delay when scrolled to 2nd portion */}
+      {/* Floating Navbar (exact same glass pill as hero) that animates in from top center after 1.5-second delay when scrolled to 2nd portion - hides when toolbox overlay is open */}
       <AnimatePresence>
-        {showAboutNavbar && (
+        {showAboutNavbar && !isToolboxOpen && (
           <motion.div
             key="about-fixed-navbar"
             initial={{ y: -60, x: "-50%", opacity: 0 }}
