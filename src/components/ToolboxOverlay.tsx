@@ -131,7 +131,7 @@ export const ToolboxOverlay: React.FC<ToolboxOverlayProps> = ({ isOpen, onClose 
 
             {/* 2. Hardware && Software Section (lines brought ultra-close to text) */}
             <div className="pt-[1px] pb-[3px] sm:pt-[2px] sm:pb-[4px] px-6 text-center border-b border-[#DCDCE2]">
-              <h2 className="text-2xl sm:text-3xl md:text-[34px] font-['Geist',sans-serif] font-medium text-black tracking-[-0.03em] leading-[1.08] m-0 p-0">
+              <h2 className="text-[26px] sm:text-[33px] md:text-[37px] lg:text-[41px] font-['Geist',sans-serif] font-medium text-black tracking-[-0.03em] leading-[1.08] m-0 p-0">
                 Hardware && software
                 <br />
                 I keep in my toolbox
@@ -178,16 +178,16 @@ export const ToolboxOverlay: React.FC<ToolboxOverlayProps> = ({ isOpen, onClose 
                       key={tool.name}
                       className="group flex flex-col items-center cursor-default shrink-0"
                     >
-                      {/* Outer Box: exact same styling as toolbox card VS Code tile + drop shadow on hover */}
+                      {/* Outer Box: exact same styling as toolbox card VS Code tile + stroke color change on hover */}
                       <div 
-                        className="w-[82px] h-[82px] sm:w-[100px] sm:h-[100px] md:w-[112px] md:h-[112px] lg:w-[120px] lg:h-[120px] rounded-[20px] p-[5px] sm:p-[6px] flex items-center justify-center cursor-default transition-all duration-300 border-[1.4px] border-[#D6DADE] group-hover:border-[#818CF8] group-hover:shadow-[0_0_22px_rgba(59,72,236,0.25)]"
+                        className="w-[82px] h-[82px] sm:w-[100px] sm:h-[100px] md:w-[112px] md:h-[112px] lg:w-[120px] lg:h-[120px] rounded-[16px] p-[5px] sm:p-[6px] flex items-center justify-center cursor-default transition-all duration-300 border-[1.4px] border-[#D6DADE] group-hover:border-[#818CF8]"
                         style={{
                           backgroundColor: '#F7F7F8',
                         }}
                       >
                         {/* Inner Box: rgba(237, 238, 240, 0.85) with 1.85px stroke and slightly reduced inset shadow */}
                         <div
-                          className="w-full h-full rounded-[16px] flex items-center justify-center transition-colors duration-200"
+                          className="w-full h-full rounded-[12px] flex items-center justify-center transition-colors duration-200"
                           style={{
                             backgroundColor: 'rgba(237, 238, 240, 0.85)',
                             border: '1.85px solid rgba(230, 231, 234, 0.5)',
@@ -220,16 +220,16 @@ export const ToolboxOverlay: React.FC<ToolboxOverlayProps> = ({ isOpen, onClose 
                       key={tool.name}
                       className="group flex flex-col items-center cursor-default shrink-0"
                     >
-                      {/* Outer Box: exact same styling as toolbox card VS Code tile + drop shadow on hover */}
+                      {/* Outer Box: exact same styling as toolbox card VS Code tile + stroke color change on hover */}
                       <div 
-                        className="w-[82px] h-[82px] sm:w-[100px] sm:h-[100px] md:w-[112px] md:h-[112px] lg:w-[120px] lg:h-[120px] rounded-[20px] p-[5px] sm:p-[6px] flex items-center justify-center cursor-default transition-all duration-300 border-[1.4px] border-[#D6DADE] group-hover:border-[#818CF8] group-hover:shadow-[0_0_22px_rgba(59,72,236,0.25)]"
+                        className="w-[82px] h-[82px] sm:w-[100px] sm:h-[100px] md:w-[112px] md:h-[112px] lg:w-[120px] lg:h-[120px] rounded-[16px] p-[5px] sm:p-[6px] flex items-center justify-center cursor-default transition-all duration-300 border-[1.4px] border-[#D6DADE] group-hover:border-[#818CF8]"
                         style={{
                           backgroundColor: '#F7F7F8',
                         }}
                       >
                         {/* Inner Box: rgba(237, 238, 240, 0.85) with 1.85px stroke and slightly reduced inset shadow */}
                         <div
-                          className="w-full h-full rounded-[16px] flex items-center justify-center transition-colors duration-200"
+                          className="w-full h-full rounded-[12px] flex items-center justify-center transition-colors duration-200"
                           style={{
                             backgroundColor: 'rgba(237, 238, 240, 0.85)',
                             border: '1.85px solid rgba(230, 231, 234, 0.5)',
@@ -272,8 +272,8 @@ export const ToolboxOverlay: React.FC<ToolboxOverlayProps> = ({ isOpen, onClose 
               <div className="bg-[#E7E7EC] rounded-[18px] sm:rounded-[22px] p-3.5 sm:p-5 border border-black/5 max-w-[940px] mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4 items-stretch">
                   {/* Left: System Specs Card */}
-                  <div className="bg-[#F8F8FA] rounded-[14px] sm:rounded-[16px] border border-[#DCE0E6] p-4 sm:p-5 shadow-[0_1px_4px_rgba(0,0,0,0.02)] flex flex-col justify-between">
-                    <h3 className="text-[14px] sm:text-[15px] font-['Geist',sans-serif] font-medium text-black text-center pb-4 border-b border-[#E4E4EC] mb-6 sm:mb-7">
+                  <div className="bg-[#F8F8FA] rounded-[14px] sm:rounded-[16px] border border-[#DCE0E6] py-4 sm:py-5 pl-5 sm:pl-6 md:pl-7 pr-4 sm:pr-5 md:pr-5 shadow-[0_1px_4px_rgba(0,0,0,0.02)] flex flex-col justify-between">
+                    <h3 className="text-[13.5px] sm:text-[14.5px] font-['Geist',sans-serif] font-medium text-black text-center pb-4 border-b border-[#E4E4EC] mb-6 sm:mb-7">
                       System
                     </h3>
 
@@ -282,10 +282,10 @@ export const ToolboxOverlay: React.FC<ToolboxOverlayProps> = ({ isOpen, onClose 
                         const isGPU = spec.label === 'GPU';
                         return (
                           <div key={spec.label} className="flex items-start justify-between gap-4 sm:gap-6">
-                            <span className={`w-24 sm:w-28 text-[13.5px] sm:text-[14.5px] font-['Geist',sans-serif] font-normal shrink-0 ${isGPU ? 'line-through text-[#757575]' : 'text-black'}`}>
+                            <span className={`w-24 sm:w-28 text-[12.5px] sm:text-[13.5px] font-['Geist',sans-serif] font-normal shrink-0 ${isGPU ? 'line-through text-[#757575]' : 'text-black'}`}>
                               {spec.label}
                             </span>
-                            <span className={`text-[13.5px] sm:text-[14.5px] font-['Geist',sans-serif] font-normal leading-snug text-right sm:text-left flex-1 ${isGPU ? 'line-through text-[#757575]' : 'text-[#757575]'}`}>
+                            <span className={`text-[12.5px] sm:text-[13.5px] font-['Geist',sans-serif] font-normal leading-snug text-right sm:text-left flex-1 ${isGPU ? 'line-through text-[#757575]' : 'text-[#757575]'}`}>
                               {spec.value}
                             </span>
                           </div>
@@ -297,28 +297,28 @@ export const ToolboxOverlay: React.FC<ToolboxOverlayProps> = ({ isOpen, onClose 
                   {/* Right: Accessories Cards */}
                   <div className="flex flex-col justify-between gap-2.5 sm:gap-3 h-full">
                     {/* Accessories Header Pill: rounded top, sharp bottom */}
-                    <div className="bg-[#F8F8FA] rounded-t-[12px] sm:rounded-t-[14px] rounded-b-none border border-[#DCE0E6] flex-1 min-h-[48px] sm:min-h-[54px] px-4 flex items-center justify-center shadow-[0_1px_4px_rgba(0,0,0,0.02)] transition-colors duration-200 hover:border-[#818CF8] hover:shadow-none cursor-default">
+                    <div className="bg-[#F8F8FA] rounded-t-[12px] sm:rounded-t-[14px] rounded-b-none border border-[#DCE0E6] flex-1 min-h-[48px] sm:min-h-[54px] px-4 flex items-center justify-center shadow-[0_1px_4px_rgba(0,0,0,0.02)]">
                       <h3 className="text-[13.5px] sm:text-[14.5px] font-['Geist',sans-serif] font-medium text-black">
                         Accessories
                       </h3>
                     </div>
 
                     {/* Logitech Mouse Card: all sharp corners */}
-                    <div className="bg-[#F8F8FA] rounded-none border border-[#DCE0E6] flex-1 min-h-[48px] sm:min-h-[54px] px-4 flex items-center justify-center shadow-[0_1px_4px_rgba(0,0,0,0.02)] transition-colors duration-200 hover:border-[#818CF8] hover:shadow-none cursor-default text-center">
+                    <div className="bg-[#F8F8FA] rounded-none border border-[#DCE0E6] flex-1 min-h-[48px] sm:min-h-[54px] px-4 flex items-center justify-center shadow-[0_1px_4px_rgba(0,0,0,0.02)] text-center">
                       <h4 className="text-[13px] sm:text-[14px] font-['Geist',sans-serif] font-medium text-black">
                         Logitech G102 Lightsync
                       </h4>
                     </div>
 
                     {/* boAt Headset Card: all sharp corners */}
-                    <div className="bg-[#F8F8FA] rounded-none border border-[#DCE0E6] flex-1 min-h-[48px] sm:min-h-[54px] px-4 flex items-center justify-center shadow-[0_1px_4px_rgba(0,0,0,0.02)] transition-colors duration-200 hover:border-[#818CF8] hover:shadow-none cursor-default text-center">
+                    <div className="bg-[#F8F8FA] rounded-none border border-[#DCE0E6] flex-1 min-h-[48px] sm:min-h-[54px] px-4 flex items-center justify-center shadow-[0_1px_4px_rgba(0,0,0,0.02)] text-center">
                       <h4 className="text-[13px] sm:text-[14px] font-['Geist',sans-serif] font-medium text-black">
                         boAt Rockerz Prime 415
                       </h4>
                     </div>
 
                     {/* realme Buds 2 Card: sharp top, rounded bottom */}
-                    <div className="bg-[#F8F8FA] rounded-t-none rounded-b-[14px] sm:rounded-b-[16px] border border-[#DCE0E6] flex-1 min-h-[48px] sm:min-h-[54px] px-4 flex items-center justify-center shadow-[0_1px_4px_rgba(0,0,0,0.02)] transition-colors duration-200 hover:border-[#818CF8] hover:shadow-none cursor-default text-center">
+                    <div className="bg-[#F8F8FA] rounded-t-none rounded-b-[14px] sm:rounded-b-[16px] border border-[#DCE0E6] flex-1 min-h-[48px] sm:min-h-[54px] px-4 flex items-center justify-center shadow-[0_1px_4px_rgba(0,0,0,0.02)] text-center">
                       <h4 className="text-[13px] sm:text-[14px] font-['Geist',sans-serif] font-medium text-black">
                         realme Buds 2
                       </h4>

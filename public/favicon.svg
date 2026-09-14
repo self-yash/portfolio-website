@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect width="64" height="64" rx="16" fill="#050608"/>
+  <rect x="0.75" y="0.75" width="62.5" height="62.5" rx="15.25" stroke="#262833" stroke-width="1.5"/>
+  <defs>
+    <linearGradient id="ymGrad" x1="14" y1="14" x2="50" y2="50" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4596DD"/>
+      <stop offset="1" stop-color="#00D2B4"/>
+    </linearGradient>
+  </defs>
+  <!-- Stylized Y -->
+  <path d="M16 19L25.5 32V45" stroke="url(#ymGrad)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M35 19L25.5 32" stroke="url(#ymGrad)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Stylized M -->
+  <path d="M35 45V27L42 36L49 27V45" stroke="#FFFFFF" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

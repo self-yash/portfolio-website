@@ -485,12 +485,12 @@ export default function App() {
               opacity: 0, 
               transition: { delay: 0, duration: 0.22, ease: "easeIn" } 
             }}
-            className="fixed top-6 md:top-8 left-1/2 z-50 flex items-center justify-center pointer-events-auto"
+            className="fixed top-5 md:top-8 left-1/2 z-50 flex items-center justify-center pointer-events-auto max-w-[calc(100vw-24px)]"
           >
-            <div className="flex items-center gap-1 p-1 rounded-full bg-[rgba(255,255,255,0.72)] backdrop-blur-[20px] backdrop-saturate-[180%] border border-black/10 text-[15px] font-['Geist_Mono',monospace] font-bold shadow-[0_8px_32px_rgba(0,0,0,0.08)]">
+            <div className="flex items-center gap-0.5 sm:gap-1 p-0.5 sm:p-1 rounded-full bg-[rgba(255,255,255,0.72)] backdrop-blur-[20px] backdrop-saturate-[180%] border border-black/10 text-[12px] sm:text-[15px] font-['Geist_Mono',monospace] font-bold shadow-[0_8px_32px_rgba(0,0,0,0.08)] max-w-full">
               <button 
                 onClick={scrollToHome}
-                className={`px-5 py-2 rounded-full transition-all whitespace-nowrap cursor-pointer ${
+                className={`px-3 py-1.5 sm:px-5 sm:py-2 rounded-full transition-all whitespace-nowrap cursor-pointer ${
                   activeSection === 'home'
                     ? "border border-black/[0.04] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] text-black"
                     : "border border-transparent hover:bg-black/5 text-black/70 hover:text-black"
@@ -500,7 +500,7 @@ export default function App() {
               </button>
               <button 
                 onClick={scrollToAbout}
-                className={`px-5 py-2 rounded-full transition-all whitespace-nowrap cursor-pointer ${
+                className={`px-3 py-1.5 sm:px-5 sm:py-2 rounded-full transition-all whitespace-nowrap cursor-pointer ${
                   activeSection === 'about'
                     ? "border border-black/[0.04] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] text-black"
                     : "border border-transparent hover:bg-black/5 text-black/70 hover:text-black"
@@ -510,7 +510,7 @@ export default function App() {
               </button>
               <button 
                 onClick={scrollToProject}
-                className={`px-5 py-2 rounded-full transition-all whitespace-nowrap cursor-pointer ${
+                className={`px-3 py-1.5 sm:px-5 sm:py-2 rounded-full transition-all whitespace-nowrap cursor-pointer ${
                   activeSection === 'projects'
                     ? "border border-black/[0.04] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] text-black"
                     : "border border-transparent hover:bg-black/5 text-black/70 hover:text-black"
@@ -520,7 +520,7 @@ export default function App() {
               </button>
               <button 
                 onClick={scrollToStack}
-                className={`px-5 py-2 rounded-full transition-all whitespace-nowrap cursor-pointer ${
+                className={`px-3 py-1.5 sm:px-5 sm:py-2 rounded-full transition-all whitespace-nowrap cursor-pointer ${
                   activeSection === 'stack'
                     ? "border border-black/[0.04] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] text-black"
                     : "border border-transparent hover:bg-black/5 text-black/70 hover:text-black"
