@@ -1,12 +1,15 @@
 import React, { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 
 function SkillBar({ name, sub, value, isCyan, delay = 0 }: { name: string, sub?: string, value: number, isCyan?: boolean, delay?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, amount: 0.1 });
+
   return (
     <motion.div 
+      ref={ref}
       initial={{ opacity: 0, y: 12 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
       transition={{ duration: 0.5, ease: "easeOut", delay }}
       className="w-full relative"
     >
@@ -23,7 +26,7 @@ function SkillBar({ name, sub, value, isCyan, delay = 0 }: { name: string, sub?:
                 <span className="relative group/peak inline-flex items-center ml-1 cursor-default">
                   <span className="text-[#757575]/80 font-normal">{sub}</span>
                   {/* Tooltip pop matching reference with #242429 and smooth rounded arrow */}
-                  <span className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-[8px] bg-[#242429] border border-white/10 text-white text-[12.5px] font-['Geist',sans-serif] font-medium opacity-0 group-hover/peak:opacity-100 group-hover/peak:-translate-y-1 transition-all duration-200 pointer-events-none z-30 whitespace-nowrap flex items-center justify-center">
+                  <span className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-[8px] bg-[#242429] border border-white/10 text-white text-[12.5px] font-['Geist',sans-serif] font-normal opacity-0 group-hover/peak:opacity-100 group-hover/peak:-translate-y-1 transition-all duration-200 pointer-events-none z-30 whitespace-nowrap flex items-center justify-center">
                     Peak
                     <svg 
                       className="absolute -bottom-[5.5px] left-1/2 -translate-x-1/2 overflow-visible" 
@@ -58,9 +61,8 @@ function SkillBar({ name, sub, value, isCyan, delay = 0 }: { name: string, sub?:
       <div className="w-full h-[5.5px] bg-black/10 rounded-full overflow-hidden">
         <motion.div 
           initial={{ width: 0 }}
-          whileInView={{ width: `${value}%` }}
-          viewport={{ once: true, margin: "-50px" }}
-          transition={{ duration: 1, ease: "easeOut", delay: delay + 0.2 }}
+          animate={isInView ? { width: `${value}%` } : { width: 0 }}
+          transition={{ duration: 1, ease: "easeOut", delay: delay + 0.15 }}
           className="h-full"
           style={{ backgroundColor: isCyan ? 'rgba(82, 210, 222, 0.86)' : '#4F46E5' }}
         />
@@ -74,7 +76,7 @@ function CategoryCard({ title, tags, delay = 0 }: { title: string, tags: string[
     <motion.div 
       initial={{ opacity: 0, y: 12 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
+      viewport={{ once: true, amount: 0.1 }}
       transition={{ duration: 0.5, ease: "easeOut", delay }}
       className="w-full rounded-[22px] border border-black/30 px-6 py-4.5 md:py-5 flex flex-col gap-3.5 bg-[#DCDCDC]/75 backdrop-blur-[2px]"
       style={{ backgroundColor: 'rgba(220, 220, 220, 0.75)' }}
@@ -135,7 +137,7 @@ export default function StackSection() {
           <motion.div 
             initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
+            viewport={{ once: true, amount: 0.1 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
             className="flex items-center gap-2.5 text-black font-['Geist_Mono',monospace] font-normal text-sm md:text-[14px] mb-4"
           >
@@ -148,7 +150,7 @@ export default function StackSection() {
           <motion.h2 
             initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
+            viewport={{ once: true, amount: 0.1 }}
             transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
             className="text-4xl sm:text-5xl md:text-[54px] lg:text-[60px] font-['Cal_Sans',sans-serif] font-normal tracking-tight text-[#757575] leading-[1.05]"
           >
@@ -157,7 +159,7 @@ export default function StackSection() {
           <motion.h3 
             initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
+            viewport={{ once: true, amount: 0.1 }}
             transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
             className="text-4xl sm:text-5xl md:text-[54px] lg:text-[60px] font-['Cal_Sans',sans-serif] font-normal tracking-tight text-black leading-[1.05] mt-1 md:mt-2"
           >

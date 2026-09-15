@@ -46,6 +46,12 @@ export default function App() {
 
   useEffect(() => {
     const handleGlobalMouseMove = (e: MouseEvent) => {
+      // Disable custom cursor on mobile screens
+      if (typeof window !== 'undefined' && window.innerWidth < 768) {
+        setIsHeroHovered(false);
+        return;
+      }
+
       setMousePos({ x: e.clientX, y: e.clientY });
 
       // If mouse Y is over or within the About section, disable hero custom cursor
@@ -286,7 +292,7 @@ export default function App() {
     <div className="relative w-full min-h-screen bg-black text-white font-sans selection:bg-blue-500/30 overflow-x-clip">
       
       {/* Hero Section (Sticky underneath) */}
-      <section className={`sticky top-0 w-full h-[100dvh] overflow-hidden z-0 ${isHeroHovered ? 'cursor-none [&_*]:cursor-none' : ''}`}>
+      <section className={`sticky top-0 w-full h-[100dvh] overflow-hidden z-0 ${isHeroHovered ? 'md:cursor-none md:[&_*]:cursor-none' : ''}`}>
         {/* Full-bleed background & glass panes stay unscaled and unblurred */}
         <Background />
         
@@ -314,13 +320,14 @@ export default function App() {
           }}
         >
           {/* Navbar */}
-          <nav className="absolute top-0 left-0 w-full z-20 flex items-center justify-between px-8 py-6 md:px-16 md:py-8">
-            <div 
+          <nav aria-label="Main Navigation" className="absolute top-0 left-0 w-full z-20 flex items-center justify-between px-8 py-6 md:px-16 md:py-8">
+            <button 
               onClick={scrollToHome}
-              className="text-[16px] md:text-[18px] lg:text-[20px] font-['Giordani_Registry','GIORDANI_Registry',serif] tracking-normal uppercase flex-1 cursor-pointer select-none transition-opacity hover:opacity-80 leading-none"
+              className="text-[16px] md:text-[18px] lg:text-[20px] font-['Giordani_Registry','GIORDANI_Registry',serif] tracking-normal uppercase flex-1 cursor-pointer select-none transition-opacity hover:opacity-80 leading-none text-left bg-transparent border-0 p-0 text-white rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-4 focus-visible:ring-offset-black/50"
+              aria-label="Yash Mehta - scroll to top"
             >
               Yash Mehta
-            </div>
+            </button>
             
             {/* Glass Pill */}
             <motion.div 
@@ -329,44 +336,48 @@ export default function App() {
               transition={{ type: "spring", stiffness: 120, damping: 14, delay: 0.2 }}
               className="hidden md:flex flex-1 justify-center z-50"
             >
-              <div className="flex items-center gap-1 p-1 rounded-full bg-white/[0.08] backdrop-blur-md border border-white/10 text-[15px] font-['Geist_Mono',monospace] font-bold">
+              <div role="tablist" aria-label="Sections" className="flex items-center gap-1 p-1 rounded-full bg-white/[0.08] backdrop-blur-md border border-white/10 text-[15px] font-['Geist_Mono',monospace] font-bold">
                 <button 
                   onClick={scrollToHome}
-                  className={`px-5 py-2 rounded-full transition-all whitespace-nowrap cursor-pointer ${
+                  className={`px-5 py-2 rounded-full transition-all whitespace-nowrap cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/60 ${
                     activeSection === 'home'
                       ? "border border-white/20 border-r-white/80 bg-[linear-gradient(90deg,rgba(255,255,255,0.05),rgba(255,255,255,0.15))] backdrop-blur-3xl shadow-[inset_-1px_0_1px_rgba(255,255,255,0.8),inset_0_0_10px_rgba(255,255,255,0.1)] text-white"
                       : "border border-transparent hover:bg-white/5 text-white/80 hover:text-white"
                   }`}
+                  aria-current={activeSection === 'home' ? 'page' : undefined}
                 >
                   Home
                 </button>
                 <button 
                   onClick={scrollToAbout}
-                  className={`px-5 py-2 rounded-full transition-all whitespace-nowrap cursor-pointer ${
+                  className={`px-5 py-2 rounded-full transition-all whitespace-nowrap cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/60 ${
                     activeSection === 'about'
                       ? "border border-white/20 border-r-white/80 bg-[linear-gradient(90deg,rgba(255,255,255,0.05),rgba(255,255,255,0.15))] backdrop-blur-3xl shadow-[inset_-1px_0_1px_rgba(255,255,255,0.8),inset_0_0_10px_rgba(255,255,255,0.1)] text-white"
                       : "border border-transparent hover:bg-white/5 text-white/80 hover:text-white"
                   }`}
+                  aria-current={activeSection === 'about' ? 'page' : undefined}
                 >
                   About
                 </button>
                 <button 
                   onClick={scrollToProject}
-                  className={`px-5 py-2 rounded-full transition-all whitespace-nowrap cursor-pointer ${
+                  className={`px-5 py-2 rounded-full transition-all whitespace-nowrap cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/60 ${
                     activeSection === 'projects'
                       ? "border border-white/20 border-r-white/80 bg-[linear-gradient(90deg,rgba(255,255,255,0.05),rgba(255,255,255,0.15))] backdrop-blur-3xl shadow-[inset_-1px_0_1px_rgba(255,255,255,0.8),inset_0_0_10px_rgba(255,255,255,0.1)] text-white"
                       : "border border-transparent hover:bg-white/5 text-white/80 hover:text-white"
                   }`}
+                  aria-current={activeSection === 'projects' ? 'page' : undefined}
                 >
                   Project
                 </button>
                 <button 
                   onClick={scrollToStack}
-                  className={`px-5 py-2 rounded-full transition-all whitespace-nowrap cursor-pointer ${
+                  className={`px-5 py-2 rounded-full transition-all whitespace-nowrap cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/60 ${
                     activeSection === 'stack'
                       ? "border border-white/20 border-r-white/80 bg-[linear-gradient(90deg,rgba(255,255,255,0.05),rgba(255,255,255,0.15))] backdrop-blur-3xl shadow-[inset_-1px_0_1px_rgba(255,255,255,0.8),inset_0_0_10px_rgba(255,255,255,0.1)] text-white"
                       : "border border-transparent hover:bg-white/5 text-white/80 hover:text-white"
                   }`}
+                  aria-current={activeSection === 'stack' ? 'page' : undefined}
                 >
                   Stack
                 </button>
@@ -435,7 +446,7 @@ export default function App() {
                     I build things, explore weird ideas, and occasionally make the internet a little more interesting.
                   </p>
                   <p>
-                    I like making things that work. Most Known For <a href="https://github.com/Self-nasu/HandFlow" target="_blank" rel="noopener noreferrer" className="text-[#FFFFFF] opacity-100 underline decoration-[#1F9CF0] hover:bg-[#1F9CF0] hover:text-black hover:no-underline transition-all duration-300 underline-offset-4 font-medium px-1 -mx-1 rounded">HandFlow.</a>
+                    I like making things that work. Most Known For <a href="https://github.com/Self-nasu/HandFlow" target="_blank" rel="noopener noreferrer" className="text-[#FFFFFF] opacity-100 underline decoration-[#1F9CF0] hover:bg-[#1F9CF0] hover:text-black hover:no-underline transition-all duration-300 underline-offset-4 font-medium px-1 -mx-1 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1AA1FF] focus-visible:ring-offset-2 focus-visible:ring-offset-black">HandFlow.</a>
                   </p>
                 </div>
               </div>
@@ -443,7 +454,7 @@ export default function App() {
               <div className="mt-5 flex flex-col sm:flex-row items-center gap-4">
                 <button 
                   onClick={scrollToAbout}
-                  className="w-full sm:w-auto px-[30px] py-3 rounded-full bg-[#1AA1FF] text-black font-['Geist_Mono',monospace] font-normal tracking-wide transition-all duration-300 flex items-center justify-center gap-2 hover:-translate-y-1 hover:shadow-[0_0_74.5px_2px_rgba(31,156,240,0.62)] cursor-pointer"
+                  className="w-full sm:w-auto px-[30px] py-3 rounded-full bg-[#1AA1FF] text-black font-['Geist_Mono',monospace] font-normal tracking-wide transition-all duration-300 flex items-center justify-center gap-2 hover:-translate-y-1 hover:shadow-[0_0_74.5px_2px_rgba(31,156,240,0.62)] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
                 >
                   Dive in &darr;
                 </button>
@@ -487,44 +498,48 @@ export default function App() {
             }}
             className="fixed top-5 md:top-8 left-1/2 z-50 flex items-center justify-center pointer-events-auto max-w-[calc(100vw-24px)]"
           >
-            <div className="flex items-center gap-0.5 sm:gap-1 p-0.5 sm:p-1 rounded-full bg-[rgba(255,255,255,0.72)] backdrop-blur-[20px] backdrop-saturate-[180%] border border-black/10 text-[12px] sm:text-[15px] font-['Geist_Mono',monospace] font-bold shadow-[0_8px_32px_rgba(0,0,0,0.08)] max-w-full">
+            <div role="tablist" aria-label="Floating Navigation" className="flex items-center gap-0.5 sm:gap-1 p-0.5 sm:p-1 rounded-full bg-[rgba(255,255,255,0.72)] backdrop-blur-[20px] backdrop-saturate-[180%] border border-black/10 text-[12px] sm:text-[15px] font-['Geist_Mono',monospace] font-bold shadow-[0_8px_32px_rgba(0,0,0,0.08)] max-w-full">
               <button 
                 onClick={scrollToHome}
-                className={`px-3 py-1.5 sm:px-5 sm:py-2 rounded-full transition-all whitespace-nowrap cursor-pointer ${
+                className={`px-3 py-1.5 sm:px-5 sm:py-2 rounded-full transition-all whitespace-nowrap cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-black/80 focus-visible:ring-offset-2 focus-visible:ring-offset-white/80 ${
                   activeSection === 'home'
                     ? "border border-black/[0.04] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] text-black"
                     : "border border-transparent hover:bg-black/5 text-black/70 hover:text-black"
                 }`}
+                aria-current={activeSection === 'home' ? 'page' : undefined}
               >
                 Home
               </button>
               <button 
                 onClick={scrollToAbout}
-                className={`px-3 py-1.5 sm:px-5 sm:py-2 rounded-full transition-all whitespace-nowrap cursor-pointer ${
+                className={`px-3 py-1.5 sm:px-5 sm:py-2 rounded-full transition-all whitespace-nowrap cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-black/80 focus-visible:ring-offset-2 focus-visible:ring-offset-white/80 ${
                   activeSection === 'about'
                     ? "border border-black/[0.04] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] text-black"
                     : "border border-transparent hover:bg-black/5 text-black/70 hover:text-black"
                 }`}
+                aria-current={activeSection === 'about' ? 'page' : undefined}
               >
                 About
               </button>
               <button 
                 onClick={scrollToProject}
-                className={`px-3 py-1.5 sm:px-5 sm:py-2 rounded-full transition-all whitespace-nowrap cursor-pointer ${
+                className={`px-3 py-1.5 sm:px-5 sm:py-2 rounded-full transition-all whitespace-nowrap cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-black/80 focus-visible:ring-offset-2 focus-visible:ring-offset-white/80 ${
                   activeSection === 'projects'
                     ? "border border-black/[0.04] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] text-black"
                     : "border border-transparent hover:bg-black/5 text-black/70 hover:text-black"
                 }`}
+                aria-current={activeSection === 'projects' ? 'page' : undefined}
               >
                 Project
               </button>
               <button 
                 onClick={scrollToStack}
-                className={`px-3 py-1.5 sm:px-5 sm:py-2 rounded-full transition-all whitespace-nowrap cursor-pointer ${
+                className={`px-3 py-1.5 sm:px-5 sm:py-2 rounded-full transition-all whitespace-nowrap cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-black/80 focus-visible:ring-offset-2 focus-visible:ring-offset-white/80 ${
                   activeSection === 'stack'
                     ? "border border-black/[0.04] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] text-black"
                     : "border border-transparent hover:bg-black/5 text-black/70 hover:text-black"
                 }`}
+                aria-current={activeSection === 'stack' ? 'page' : undefined}
               >
                 Stack
               </button>
@@ -533,9 +548,9 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* Small white circle cursor active when hovering in Hero section */}
+      {/* Small white circle cursor active when hovering in Hero section (hidden on mobile screens) */}
       <div 
-        className={`fixed pointer-events-none z-[9999] rounded-full bg-white -translate-x-1/2 -translate-y-1/2 shadow-[0_0_8px_rgba(255,255,255,0.7)] transition-opacity duration-150 ease-out ${
+        className={`hidden md:block fixed pointer-events-none z-[9999] rounded-full bg-white -translate-x-1/2 -translate-y-1/2 shadow-[0_0_8px_rgba(255,255,255,0.7)] transition-opacity duration-150 ease-out ${
           isHeroHovered ? 'opacity-100' : 'opacity-0'
         } ${
           isHoveringClickable ? 'w-3.5 h-3.5' : 'w-2 h-2'
