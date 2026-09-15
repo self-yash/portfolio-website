@@ -22,7 +22,16 @@ export default function AboutSection({
   const [internalIsToolboxOpen, setInternalIsToolboxOpen] = useState(false);
   const isToolboxOpen = externalIsToolboxOpen !== undefined ? externalIsToolboxOpen : internalIsToolboxOpen;
   const setIsToolboxOpen = externalSetIsToolboxOpen || setInternalIsToolboxOpen;
+  const [triggerRect, setTriggerRect] = useState<DOMRect | null>(null);
+  const toolboxCardRef = useRef<HTMLDivElement>(null);
   const tickerRef = useRef<HTMLDivElement>(null);
+
+  const handleOpenToolbox = () => {
+    if (toolboxCardRef.current) {
+      setTriggerRect(toolboxCardRef.current.getBoundingClientRect());
+    }
+    setIsToolboxOpen(true);
+  };
   const { scrollYProgress } = useScroll({
     target: tickerRef,
     offset: ["start end", "end start"]
@@ -168,10 +177,20 @@ export default function AboutSection({
             {/* Right Column */}
             <div className="flex flex-col gap-3">
               
-              {/* Toolbox Card - Reduced length: 240px with crisp #757575 border, 18px radius, more breathing space, no hover effect */}
+              {/* Toolbox Card - Reduced length: 240px with crisp #757575 border, 18px radius, more breathing space, expands into overlay */}
               <div 
-                onClick={() => setIsToolboxOpen(true)}
-                className="bg-[#F8F8F9] rounded-[18px] p-5 md:p-6 border border-[#757575] flex flex-col items-center justify-center overflow-hidden relative h-auto min-h-[210px] lg:h-[240px] group cursor-pointer"
+                ref={toolboxCardRef}
+                onClick={handleOpenToolbox}
+                tabIndex={0}
+                role="button"
+                aria-label="Open Toolbox overlay"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleOpenToolbox();
+                  }
+                }}
+                className="bg-[#F8F8F9] rounded-[18px] p-5 md:p-6 border border-[#757575] flex flex-col items-center justify-center overflow-hidden relative h-auto min-h-[210px] lg:h-[240px] group cursor-pointer active:scale-[0.985] transition-transform duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#4F46E5]"
               >
                 <h3 className="text-[16px] font-['Geist',sans-serif] font-medium text-black mb-1.5 z-10 text-center">
                   Toolbox
@@ -521,7 +540,11 @@ export default function AboutSection({
       <FooterSection />
 
       {/* Toolbox Overlay Modal */}
-      <ToolboxOverlay isOpen={isToolboxOpen} onClose={() => setIsToolboxOpen(false)} />
+      <ToolboxOverlay 
+        isOpen={isToolboxOpen} 
+        onClose={() => setIsToolboxOpen(false)} 
+        triggerRect={triggerRect}
+      />
     </section>
   );
 }

@@ -5,6 +5,7 @@ import { X } from 'lucide-react';
 interface ToolboxOverlayProps {
   isOpen: boolean;
   onClose: () => void;
+  triggerRect?: DOMRect | null;
 }
 
 interface ToolItem {
@@ -43,7 +44,7 @@ const systemSpecs: SpecItem[] = [
   { label: 'Monitor', value: '15.6" 144Hz FHD 100% sRGB Anti-Glare Dolby Vision' },
 ];
 
-export const ToolboxOverlay: React.FC<ToolboxOverlayProps> = ({ isOpen, onClose }) => {
+export const ToolboxOverlay: React.FC<ToolboxOverlayProps> = ({ isOpen, onClose, triggerRect }) => {
   // Lock body & Lenis smooth scroll and listen for Escape key when overlay is active
   useEffect(() => {
     if (!isOpen) return;
@@ -89,6 +90,45 @@ export const ToolboxOverlay: React.FC<ToolboxOverlayProps> = ({ isOpen, onClose 
     };
   }, [isOpen, onClose]);
 
+  // Calculate relative transform origin from trigger card
+  const getOrigin = (rect?: DOMRect | null) => {
+    if (!rect || typeof window === 'undefined') {
+      return {
+        x: 0,
+        y: 40,
+        scale: 0.88,
+        opacity: 0,
+        borderRadius: '24px',
+      };
+    }
+
+    const isMobile = window.innerWidth < 640;
+    const targetModalWidth = Math.min(window.innerWidth - (isMobile ? 32 : 64), 1050);
+
+    const cardCenterX = rect.left + rect.width / 2;
+    const cardCenterY = rect.top + rect.height / 2;
+
+    const modalCenterX = window.innerWidth / 2;
+    // On desktop, the modal is vertically centered. On small screens with items-start, top offset is ~24px
+    const modalCenterY = isMobile
+      ? 24 + Math.min(window.innerHeight * 0.85, 620) / 2
+      : window.innerHeight / 2;
+
+    const deltaX = cardCenterX - modalCenterX;
+    const deltaY = cardCenterY - modalCenterY;
+    const scale = Math.max(0.18, Math.min(rect.width / targetModalWidth, 0.7));
+
+    return {
+      x: deltaX,
+      y: deltaY,
+      scale,
+      opacity: 0.2,
+      borderRadius: '18px',
+    };
+  };
+
+  const origin = getOrigin(triggerRect);
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -103,20 +143,53 @@ export const ToolboxOverlay: React.FC<ToolboxOverlayProps> = ({ isOpen, onClose 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
+            transition={{ duration: 0.55 }}
             onClick={onClose}
             className="fixed inset-0 bg-black/75 backdrop-blur-sm"
           />
 
-          {/* Modal Container: Matching the exact width of About Bento cards (1050px) */}
+          {/* Modal Container: Expands directly from the Toolbox card */}
           <motion.div
-            initial={{ y: '100vh', opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: '100vh', opacity: 0 }}
-            transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
+            initial={{
+              x: origin.x,
+              y: origin.y,
+              scale: origin.scale,
+              opacity: origin.opacity,
+              borderRadius: origin.borderRadius,
+            }}
+            animate={{
+              x: 0,
+              y: 0,
+              scale: 1,
+              opacity: 1,
+              borderRadius: '28px',
+              transition: {
+                duration: 0.75,
+                ease: [0.16, 1, 0.3, 1],
+              },
+            }}
+            exit={{
+              x: origin.x,
+              y: origin.y,
+              scale: origin.scale,
+              opacity: 0,
+              borderRadius: origin.borderRadius,
+              transition: {
+                duration: 0.5,
+                ease: [0.22, 1, 0.36, 1],
+              },
+            }}
+            style={{ transformOrigin: 'center center' }}
             className="relative z-10 w-full max-w-[1050px] bg-[#F7F7F8] rounded-[24px] sm:rounded-[28px] border border-[#DCDCE2] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5)] flex flex-col my-auto shrink-0 select-none overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4, delay: 0.18, ease: 'easeOut' }}
+              className="w-full flex flex-col relative"
+            >
             {/* Close Button */}
             <button
               onClick={onClose}
@@ -329,6 +402,7 @@ export const ToolboxOverlay: React.FC<ToolboxOverlayProps> = ({ isOpen, onClose 
               </div>
             </div>
 
+            </motion.div>
           </motion.div>
         </div>
       )}
