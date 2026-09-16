@@ -29,8 +29,8 @@
     "lucide-react": "^1.45.0",
     "meshline": "^3.3.1",
     "motion": "^12.23.24",
-    "react": "^19.0.1",
-    "react-dom": "^19.0.1",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
     "three": "^0.186.0",
     "three-stdlib": "^2.36.1",
     "vite": "^6.2.3"
