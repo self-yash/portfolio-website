@@ -41,51 +41,76 @@ export default function App() {
   const aboutRef = useRef<HTMLDivElement>(null);
   const lenisRef = useRef<Lenis | null>(null);
 
-  // Hero section custom white circle cursor
-  const [mousePos, setMousePos] = useState({ x: -100, y: -100 });
-  const [isHeroHovered, setIsHeroHovered] = useState(false);
-  const [isHoveringClickable, setIsHoveringClickable] = useState(false);
+  // High-performance Hero section custom circle cursor (zero React re-renders, 0ms lag)
+  const cursorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const cursor = cursorRef.current;
+    if (!cursor) return;
+
+    let isVisible = false;
+    let isClickable = false;
+
     const handleGlobalMouseMove = (e: MouseEvent) => {
-      // Disable custom cursor on mobile screens
-      if (typeof window !== 'undefined' && window.innerWidth < 768) {
-        setIsHeroHovered(false);
+      // Disable custom cursor on mobile / touch screens
+      if (window.innerWidth < 768) {
+        if (isVisible) {
+          cursor.style.opacity = '0';
+          isVisible = false;
+        }
         return;
       }
 
-      setMousePos({ x: e.clientX, y: e.clientY });
+      // 1. Instant 0-latency hardware GPU position tracking
+      cursor.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
 
-      // If mouse Y is over or within the About section, disable hero custom cursor
+      // 2. Check if pointer is over the hero section (above About section and inside window)
+      let inHero = false;
       if (aboutRef.current) {
         const aboutRect = aboutRef.current.getBoundingClientRect();
-        if (e.clientY >= aboutRect.top) {
-          setIsHeroHovered(false);
-          return;
+        inHero = e.clientY < aboutRect.top && e.clientY >= 0 && e.clientY <= window.innerHeight;
+      } else {
+        inHero = e.clientY >= 0 && e.clientY <= window.innerHeight;
+      }
+
+      if (inHero !== isVisible) {
+        isVisible = inHero;
+        cursor.style.opacity = inHero ? '1' : '0';
+      }
+
+      // 3. Scale up ring when hovering clickable elements or dragging lanyard
+      if (inHero) {
+        const target = e.target as HTMLElement | null;
+        const isLanyardGrab = document.body.style.cursor === 'grab' || document.body.style.cursor === 'grabbing';
+        const clickable = Boolean(
+          (target && target.closest('button, a, [role="button"], [role="tab"], input, textarea, .cursor-pointer')) || isLanyardGrab
+        );
+
+        if (clickable !== isClickable) {
+          isClickable = clickable;
+          if (clickable) {
+            cursor.style.width = '16px';
+            cursor.style.height = '16px';
+            cursor.style.marginLeft = '-8px';
+            cursor.style.marginTop = '-8px';
+            cursor.style.boxShadow = '0 0 10px 2px rgba(255,255,255,0.8), 0 0 0 2px rgba(255,255,255,0.4)';
+          } else {
+            cursor.style.width = '8px';
+            cursor.style.height = '8px';
+            cursor.style.marginLeft = '-4px';
+            cursor.style.marginTop = '-4px';
+            cursor.style.boxShadow = '0 0 8px rgba(255,255,255,0.7)';
+          }
         }
-      }
-
-      // If clientY is within the visible window above About section
-      if (e.clientY >= 0 && e.clientY <= window.innerHeight) {
-        setIsHeroHovered(true);
-      } else {
-        setIsHeroHovered(false);
-      }
-
-      const target = e.target as HTMLElement | null;
-      const isLanyardGrab = document.body.style.cursor === 'grab' || document.body.style.cursor === 'grabbing';
-      if ((target && target.closest('button, a, [role="button"], input, textarea')) || isLanyardGrab) {
-        setIsHoveringClickable(true);
-      } else {
-        setIsHoveringClickable(false);
       }
     };
 
     const handleMouseLeaveWindow = () => {
-      setIsHeroHovered(false);
+      cursor.style.opacity = '0';
+      isVisible = false;
     };
 
-    window.addEventListener('mousemove', handleGlobalMouseMove);
+    window.addEventListener('mousemove', handleGlobalMouseMove, { passive: true });
     document.addEventListener('mouseleave', handleMouseLeaveWindow);
     return () => {
       window.removeEventListener('mousemove', handleGlobalMouseMove);
@@ -267,6 +292,17 @@ export default function App() {
     return 1 - progress; // from 1.0 (100%) down to 0.0 (0%)
   });
 
+  // Track if hero is active (within visible viewport) to pause 3D physics when reading lower sections
+  const [isHeroActive, setIsHeroActive] = useState(true);
+
+  useEffect(() => {
+    return scrollY.on('change', (v) => {
+      const threshold = (windowHeight || 800) * 0.85;
+      const active = v < threshold;
+      setIsHeroActive((prev) => (prev !== active ? active : prev));
+    });
+  }, [scrollY, windowHeight]);
+
   useEffect(() => {
     const currentWord = words[wordIndex] || (isPhone ? "Backend Dev" : "Backend Developer");
     let timer: NodeJS.Timeout;
@@ -295,7 +331,7 @@ export default function App() {
     <div className="relative w-full min-h-screen bg-black text-white font-sans selection:bg-blue-500/30 overflow-x-clip">
       
       {/* Hero Section (Sticky underneath) */}
-      <section className={`sticky top-0 w-full h-[100dvh] overflow-hidden z-0 ${isHeroHovered ? 'md:cursor-none' : ''}`}>
+      <section className="sticky top-0 w-full h-[100dvh] overflow-hidden z-0 hero-custom-cursor-area md:cursor-none">
         {/* Full-bleed background & glass panes stay unscaled and unblurred */}
         <Background />
         
@@ -320,7 +356,7 @@ export default function App() {
           }}
           aria-label="Interactive 3D Badge"
         >
-          <Lanyard position={[0, 0, 20]} gravity={[0, -40, 0]} />
+          <Lanyard position={[0, 0, 20]} gravity={[0, -40, 0]} isHeroActive={isHeroActive} />
         </motion.div>
 
         {/* Content layer that recedes (scale, blur, opacity) on scroll */}
@@ -577,14 +613,17 @@ export default function App() {
 
       {/* Small white circle cursor active when hovering in Hero section (hidden on mobile screens) */}
       <div 
-        className={`hidden md:block fixed pointer-events-none z-[9999] rounded-full bg-white -translate-x-1/2 -translate-y-1/2 shadow-[0_0_8px_rgba(255,255,255,0.7)] transition-opacity duration-150 ease-out ${
-          isHeroHovered ? 'opacity-100' : 'opacity-0'
-        } ${
-          isHoveringClickable ? 'w-3.5 h-3.5' : 'w-2 h-2'
-        }`}
+        ref={cursorRef}
+        className="hidden md:block fixed top-0 left-0 pointer-events-none z-[9999] rounded-full bg-white opacity-0"
         style={{
-          left: `${mousePos.x}px`,
-          top: `${mousePos.y}px`,
+          width: '8px',
+          height: '8px',
+          marginLeft: '-4px',
+          marginTop: '-4px',
+          transform: 'translate3d(-100px, -100px, 0)',
+          willChange: 'transform',
+          boxShadow: '0 0 8px rgba(255,255,255,0.7)',
+          transition: 'opacity 0.15s ease-out, width 0.15s ease-out, height 0.15s ease-out, margin 0.15s ease-out, box-shadow 0.15s ease-out',
         }}
       />
     </div>

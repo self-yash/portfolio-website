@@ -290,3 +290,89 @@ export function generateYMCardTextures(): { front: string; back: string } {
     back: backCanvas.toDataURL('image/png'),
   };
 }
+
+export function generateYMLanyardTexture(): string {
+  if (typeof document === 'undefined') {
+    return '';
+  }
+
+  const W = 1024;
+  const H = 256;
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  if (!ctx) {
+    return '';
+  }
+
+  // Base background: Deep sleek matte carbon
+  const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+  bgGrad.addColorStop(0, '#090b0f');
+  bgGrad.addColorStop(0.5, '#0e1118');
+  bgGrad.addColorStop(1, '#080a0d');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Micro woven nylon twill texture
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+  for (let x = 0; x < W; x += 8) {
+    for (let y = 0; y < H; y += 8) {
+      if ((x + y) % 16 === 0) {
+        ctx.fillRect(x, y, 4, 4);
+      }
+    }
+  }
+
+  // Subtle carbon grid lines
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.035)';
+  ctx.lineWidth = 1;
+  for (let y = 30; y < H - 30; y += 24) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(W, y);
+    ctx.stroke();
+  }
+
+  // Outer stitching along both edges (Electric Blue)
+  ctx.strokeStyle = '#1F9CF0';
+  ctx.lineWidth = 3.5;
+  ctx.setLineDash([14, 8]);
+  ctx.beginPath();
+  ctx.moveTo(0, 18);
+  ctx.lineTo(W, 18);
+  ctx.moveTo(0, H - 18);
+  ctx.lineTo(W, H - 18);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Thin inner subtle silver accent line
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(0, 28);
+  ctx.lineTo(W, 28);
+  ctx.moveTo(0, H - 28);
+  ctx.lineTo(W, H - 28);
+  ctx.stroke();
+
+  // Subtle woven nylon cross-hatch herringbone pattern
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.025)';
+  ctx.lineWidth = 1.2;
+  for (let x = -H; x < W + H; x += 12) {
+    ctx.beginPath();
+    ctx.moveTo(x, 28);
+    ctx.lineTo(x + 40, H - 28);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(x, H - 28);
+    ctx.lineTo(x + 40, 28);
+    ctx.stroke();
+  }
+
+  // Pure deep matte carbon nylon weave (no text or logo on lace)
+  return canvas.toDataURL('image/png');
+}
+

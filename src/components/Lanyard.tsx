@@ -5,7 +5,7 @@ import { Canvas, extend, useFrame, useThree } from '@react-three/fiber';
 import { useGLTF, useTexture, Environment, Lightformer } from '@react-three/drei';
 import { BallCollider, CuboidCollider, Physics, RigidBody, useRopeJoint, useSphericalJoint } from '@react-three/rapier';
 import { MeshLineGeometry, MeshLineMaterial } from 'meshline';
-import { generateYMCardTextures } from '../utils/generateYMTextures';
+import { generateYMCardTextures, generateYMLanyardTexture } from '../utils/generateYMTextures';
 
 import cardGLB from '../assets/lanyard/card.glb';
 import lanyard from '../assets/lanyard/lanyard.png';
@@ -42,6 +42,7 @@ export interface LanyardProps {
   lanyardWidth?: number;
   className?: string;
   style?: React.CSSProperties;
+  isHeroActive?: boolean;
 }
 
 export default function Lanyard({
@@ -55,17 +56,22 @@ export default function Lanyard({
   lanyardImage = null,
   lanyardWidth = 1,
   className = '',
-  style = {}
+  style = {},
+  isHeroActive = true
 }: LanyardProps) {
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
 
   const defaultTextures = useMemo(() => {
-    if (typeof window === 'undefined') return { front: '', back: '' };
-    return generateYMCardTextures();
+    if (typeof window === 'undefined') return { front: '', back: '', lanyard: '' };
+    return {
+      ...generateYMCardTextures(),
+      lanyard: generateYMLanyardTexture(),
+    };
   }, []);
 
   const activeFrontImage = frontImage ?? defaultTextures.front;
   const activeBackImage = backImage ?? defaultTextures.back;
+  const activeLanyardImage = lanyardImage ?? defaultTextures.lanyard;
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -83,14 +89,15 @@ export default function Lanyard({
       >
         <Suspense fallback={null}>
           <ambientLight intensity={Math.PI} />
-          <Physics gravity={gravity} timeStep={isMobile ? 1 / 30 : 1 / 60}>
+          <Physics gravity={gravity} timeStep={isMobile ? 1 / 30 : 1 / 60} paused={!isHeroActive}>
             <Band
               isMobile={isMobile}
               frontImage={activeFrontImage}
               backImage={activeBackImage}
               imageFit={imageFit}
-              lanyardImage={lanyardImage}
+              lanyardImage={activeLanyardImage}
               lanyardWidth={lanyardWidth}
+              isHeroActive={isHeroActive}
             />
           </Physics>
           <Environment blur={0.75}>
@@ -138,6 +145,7 @@ interface BandProps {
   imageFit?: 'cover' | 'contain';
   lanyardImage?: string | null;
   lanyardWidth?: number;
+  isHeroActive?: boolean;
 }
 
 function Band({
@@ -148,9 +156,10 @@ function Band({
   backImage = null,
   imageFit = 'cover',
   lanyardImage = null,
-  lanyardWidth = 1
+  lanyardWidth = 1,
+  isHeroActive = true
 }: BandProps) {
-  const { viewport } = useThree();
+  const { viewport, size } = useThree();
   const band = useRef<any>(null);
   const fixed = useRef<any>(null);
   const j1 = useRef<any>(null);
@@ -173,7 +182,14 @@ function Band({
     return viewport.height / 2 + 0.4;
   }, [viewport.height]);
 
-  const segmentProps: any = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 4, linearDamping: 4 };
+  // Height of Marquee tech loop at bottom is ~60px
+  const marqueeTopY = useMemo(() => {
+    const marqueeHeightPx = 62;
+    const unitsPerPx = viewport.height / Math.max(size.height, 1);
+    return -(viewport.height / 2) + marqueeHeightPx * unitsPerPx;
+  }, [viewport.height, size.height]);
+
+  const segmentProps: any = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 5, linearDamping: 4 };
   const { nodes, materials } = useGLTF(cardGLB) as any;
   const texture = useTexture(lanyardImage || lanyard) as any;
   
@@ -256,29 +272,36 @@ function Band({
     }
   }, [hovered, dragged]);
 
-  useFrame((state, delta) => {
-    // Dynamic anchor position pinned to upper-right quadrant
-    const currentAnchorX = Math.min(state.viewport.width * 0.28, state.viewport.width / 2 - 2.2);
-    const currentAnchorY = state.viewport.height / 2 + 0.4;
-    if (fixed.current) {
-      fixed.current.setTranslation({ x: currentAnchorX, y: currentAnchorY, z: 0 });
-    }
-
-    // Height of Marquee tech loop at bottom is ~60px
-    const marqueeHeightPx = 62;
-    const unitsPerPx = state.viewport.height / state.size.height;
-    const marqueeHeightUnits = marqueeHeightPx * unitsPerPx;
-    // Bottom edge of screen in Three.js coordinates is -state.viewport.height / 2
-    const marqueeTopY = -(state.viewport.height / 2) + marqueeHeightUnits;
-    
-    // Card center is ~1.25 units above the lowest edge of its collider & mesh
-    const cardBottomOffset = 1.25;
-    const minCardY = marqueeTopY + cardBottomOffset;
-
-    // Invisible physical floor at marquee top
+  // Adjust floor and anchor translations only when dimensions or anchors actually update (e.g. resize)
+  useEffect(() => {
     if (floorRef.current) {
       floorRef.current.setTranslation({ x: 0, y: marqueeTopY - 1, z: 0 });
     }
+    if (fixed.current) {
+      fixed.current.setTranslation({ x: anchorX, y: anchorY, z: 0 });
+    }
+  }, [marqueeTopY, anchorX, anchorY]);
+
+  // When re-entering viewport or unpausing, cleanly resync positions and lerped vectors
+  useEffect(() => {
+    if (isHeroActive) {
+      [j1, j2].forEach(ref => {
+        if (ref.current?.translation) {
+          ref.current.lerped = new THREE.Vector3().copy(ref.current.translation());
+        }
+      });
+      [card, j1, j2, j3].forEach(ref => ref.current?.wakeUp?.());
+    }
+  }, [isHeroActive]);
+
+  useFrame((state, delta) => {
+    if (!isHeroActive) return;
+
+    // Strict delta capping to 33ms so frame drops or background tab resumption never explode physics/lerp
+    const safeDelta = Math.min(delta, 0.033);
+
+    const cardBottomOffset = 1.125;
+    const minCardY = marqueeTopY + cardBottomOffset;
 
     if (dragged && card.current) {
       vec.set(state.pointer.x, state.pointer.y, 0.5).unproject(state.camera);
@@ -286,10 +309,10 @@ function Band({
       vec.add(dir.multiplyScalar(state.camera.position.length()));
       [card, j1, j2, j3, fixed].forEach(ref => ref.current?.wakeUp());
 
-      // Clamp X to stay cleanly within visible screen (never disappears)
+      // Clamp X: Cannot be dragged further left than the horizontal half of the page (x = 0)
       const halfW = state.viewport.width / 2;
-      const cardHalfW = 0.9;
-      const minX = -halfW + cardHalfW;
+      const cardHalfW = 0.81;
+      const minX = 0; // Exactly at the horizontal center line of the page
       const maxX = halfW - cardHalfW;
       const targetX = Math.max(minX, Math.min(maxX, vec.x - dragged.x));
 
@@ -303,16 +326,39 @@ function Band({
         z: vec.z - dragged.z
       });
     }
+
+    // When card swings freely, gently bound it so it never swings past the horizontal half of the page
+    if (!dragged && card.current) {
+      const trans = card.current.translation();
+      if (trans && trans.x < 0) {
+        card.current.setTranslation({ x: 0, y: trans.y, z: trans.z }, true);
+        const lin = card.current.linvel?.();
+        if (lin && lin.x < 0) {
+          card.current.setLinvel({ x: -lin.x * 0.2, y: lin.y, z: lin.z }, true);
+        }
+      }
+    }
+
     if (fixed.current && card.current) {
       [j1, j2].forEach(ref => {
         if (!ref.current) return;
-        if (!ref.current.lerped) ref.current.lerped = new THREE.Vector3().copy(ref.current.translation());
-        const clampedDistance = Math.max(0.1, Math.min(1, ref.current.lerped.distanceTo(ref.current.translation())));
-        ref.current.lerped.lerp(
-          ref.current.translation(),
-          delta * (minSpeed + clampedDistance * (maxSpeed - minSpeed))
-        );
+        const trans = ref.current.translation();
+        if (!ref.current.lerped || isNaN(ref.current.lerped.x)) {
+          ref.current.lerped = new THREE.Vector3().copy(trans);
+          return;
+        }
+        const dist = ref.current.lerped.distanceTo(trans);
+        // If distance exceeds tolerance, instantly snap to prevent detachment
+        if (dist > 1.2) {
+          ref.current.lerped.copy(trans);
+          return;
+        }
+        const clampedDistance = Math.max(0.1, Math.min(1, dist));
+        const rawAlpha = safeDelta * (minSpeed + clampedDistance * (maxSpeed - minSpeed));
+        const lerpFactor = THREE.MathUtils.clamp(rawAlpha, 0, 0.45);
+        ref.current.lerped.lerp(trans, lerpFactor);
       });
+
       if (j3.current && j2.current?.lerped && j1.current?.lerped && fixed.current) {
         curve.points[0].copy(j3.current.translation());
         curve.points[1].copy(j2.current.lerped);
@@ -322,10 +368,16 @@ function Band({
           band.current.geometry.setPoints(curve.getPoints(isMobile ? 16 : 32));
         }
       }
+
       if (card.current.angvel && card.current.rotation) {
         ang.copy(card.current.angvel());
         rot.copy(card.current.rotation());
-        card.current.setAngvel({ x: ang.x, y: ang.y - rot.y * 0.25, z: ang.z });
+        // Dampen spinning and smoothly keep facing forward
+        card.current.setAngvel({
+          x: ang.x * 0.92,
+          y: (ang.y - rot.y * 0.35) * 0.92,
+          z: ang.z * 0.92
+        });
       }
     }
   });
@@ -338,8 +390,13 @@ function Band({
   return (
     <>
       {/* Invisible floor collider right at marquee top so card cannot swing or fall below */}
-      <RigidBody ref={floorRef} type="fixed" position={[0, -5, 0]} colliders={false}>
+      <RigidBody ref={floorRef} type="fixed" position={[0, marqueeTopY - 1, 0]} colliders={false}>
         <CuboidCollider args={[100, 1, 100]} />
+      </RigidBody>
+
+      {/* Invisible vertical barrier wall at center line so card cannot swing into left half of page */}
+      <RigidBody type="fixed" position={[-0.2, 0, 0]} colliders={false}>
+        <CuboidCollider args={[0.2, 50, 50]} />
       </RigidBody>
 
       <group position={[anchorX, anchorY, 0]}>
@@ -354,10 +411,11 @@ function Band({
           <BallCollider args={[0.1]} />
         </RigidBody>
         <RigidBody position={[2, 0, 0]} ref={card} {...segmentProps} type={dragged ? 'kinematicPosition' : 'dynamic'}>
-          <CuboidCollider args={[0.8, 1.125, 0.01]} />
+          {/* Card collider reduced by 10% */}
+          <CuboidCollider args={[0.72, 1.0125, 0.01]} />
           <group
-            scale={2.25}
-            position={[0, -1.2, -0.05]}
+            scale={2.025}
+            position={[0, -1.08, -0.05]}
             onPointerOver={() => hover(true)}
             onPointerOut={() => hover(false)}
             onPointerUp={e => ((e.target as HTMLElement).releasePointerCapture(e.pointerId), drag(false))}

@@ -162,3 +162,17 @@ body,
   }
 }
 
+/* Hero section custom cursor: hide OS Windows cursor completely on desktop so only our custom circle cursor shows */
+@media (min-width: 768px) {
+  .hero-custom-cursor-area,
+  .hero-custom-cursor-area *,
+  .hero-custom-cursor-area button,
+  .hero-custom-cursor-area a,
+  .hero-custom-cursor-area input,
+  .hero-custom-cursor-area [role="button"],
+  .hero-custom-cursor-area [role="tab"],
+  .hero-custom-cursor-area canvas {
+    cursor: none !important;
+  }
+}
+
