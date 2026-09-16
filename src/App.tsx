@@ -312,9 +312,20 @@ export default function App() {
           ))}
         </motion.div>
 
+        {/* 3D Interactive Lanyard with YM Badge: Layered behind navbar, NO push-back/scale, only blurs on scroll */}
+        <motion.div 
+          className="absolute inset-0 w-full h-full hidden md:block z-10 pointer-events-auto select-none overflow-hidden"
+          style={{ 
+            filter: blurFilter,
+          }}
+          aria-label="Interactive 3D Badge"
+        >
+          <Lanyard position={[0, 0, 20]} gravity={[0, -40, 0]} />
+        </motion.div>
+
         {/* Content layer that recedes (scale, blur, opacity) on scroll */}
         <motion.div 
-          className="relative z-10 w-full h-full origin-center"
+          className="relative z-20 w-full h-full origin-center pointer-events-none"
           style={{ 
             filter: blurFilter, 
             scale: heroScale, 
@@ -470,14 +481,6 @@ export default function App() {
               </div>
             </motion.div>
           </main>
-
-          {/* 3D Interactive Lanyard with YM Badge (Full-width viewport, layered behind navbar) */}
-          <div 
-            className="absolute inset-0 w-full h-full hidden md:block z-10 pointer-events-auto select-none overflow-hidden"
-            aria-label="Interactive 3D Badge"
-          >
-            <Lanyard position={[0, 0, 20]} gravity={[0, -40, 0]} />
-          </div>
         </motion.div>
 
         {/* Marquee stays pinned at bottom-0 */}
