@@ -5,10 +5,60 @@ import ProjectsSection from './ProjectsSection';
 import StackSection from './StackSection';
 import FooterSection from './FooterSection';
 import { ToolboxOverlay } from './ToolboxOverlay';
+import CardSwap, { Card } from './CardSwap';
 import fh6Img from '../assets/images/fh6.jpg';
 import genshinImg from '../assets/images/GenshinImpact.jpg';
 import valorantImg from '../assets/images/valorant.jpg';
 import tlouImg from '../assets/images/tlou.jpg';
+
+interface GameCard {
+  id: string;
+  title: string;
+  tag: string;
+  image: string;
+  glow: string;
+  borderColor: string;
+  tagColor: string;
+}
+
+const gameCards: GameCard[] = [
+  {
+    id: 'forza',
+    title: 'Forza Horizon 6',
+    tag: 'RACING',
+    image: fh6Img,
+    glow: 'rgba(255, 255, 255, 0.4)',
+    borderColor: '#FFFFFF',
+    tagColor: '#FFFFFF',
+  },
+  {
+    id: 'valorant',
+    title: 'Valorant',
+    tag: 'FPS',
+    image: valorantImg,
+    glow: 'rgba(255, 70, 85, 0.4)',
+    borderColor: '#FF4655',
+    tagColor: '#FF4655',
+  },
+  {
+    id: 'genshin',
+    title: 'Genshin Impact',
+    tag: 'RPG',
+    image: genshinImg,
+    glow: 'rgba(245, 158, 11, 0.4)',
+    borderColor: '#F59E0B',
+    tagColor: '#F59E0B',
+  },
+  {
+    id: 'tlou',
+    title: 'The Last of Us',
+    tag: 'ADVENTURE',
+    image: tlouImg,
+    glow: 'rgba(224, 122, 43, 0.4)',
+    borderColor: '#E07A2B',
+    tagColor: '#E07A2B',
+  },
+];
 
 interface AboutSectionProps {
   isToolboxOpen?: boolean;
@@ -23,6 +73,7 @@ export default function AboutSection({
   const isToolboxOpen = externalIsToolboxOpen !== undefined ? externalIsToolboxOpen : internalIsToolboxOpen;
   const setIsToolboxOpen = externalSetIsToolboxOpen || setInternalIsToolboxOpen;
   const [triggerRect, setTriggerRect] = useState<DOMRect | null>(null);
+  const [isGamesHovered, setIsGamesHovered] = useState(false);
   const toolboxCardRef = useRef<HTMLDivElement>(null);
   const tickerRef = useRef<HTMLDivElement>(null);
 
@@ -106,69 +157,60 @@ export default function AboutSection({
               </div>
 
               {/* Games Card - Reduced length: 240px with crisp #757575 border and 18px radius */}
-              <div className="bg-[#F8F8F9] rounded-[18px] p-5 md:p-6 border border-[#757575] relative overflow-hidden h-auto min-h-[210px] lg:h-[240px]">
-                <h3 className="text-[16px] font-['Geist',sans-serif] font-medium text-black mb-2">
+              <div 
+                onMouseEnter={() => setIsGamesHovered(true)}
+                onMouseLeave={() => setIsGamesHovered(false)}
+                className="bg-[#F8F8F9] rounded-[18px] p-5 md:p-6 border border-[#757575] relative overflow-hidden h-auto min-h-[210px] lg:h-[240px] games-bento-card group cursor-pointer select-none"
+              >
+                <h3 className="text-[16px] font-['Geist',sans-serif] font-medium text-black mb-2 relative z-10">
                   My kind of games
                 </h3>
-                <p className="font-['Geist',sans-serif] font-normal text-black/70 leading-relaxed max-w-[150px] sm:max-w-[180px] text-[14px]">
+                <p className="font-['Geist',sans-serif] font-normal text-black/70 leading-relaxed max-w-[150px] sm:max-w-[180px] text-[14px] relative z-10">
                   A collection of games I enjoy, replay, and occasionally get way too competitive about.
                 </p>
                 
-                {/* Stacked Game Cards Visual: 5th Cyberpunk (backmost), 4th TLOU, 3rd Valorant, 2nd Genshin, 1st FH6 (frontmost) */}
-                <div className="absolute right-2 sm:right-4 md:right-6 top-1/2 -translate-y-1/2 flex items-center justify-end pointer-events-none">
-                  <div className="relative flex items-center h-40 sm:h-44 lg:h-48 w-40 sm:w-48 lg:w-[250px] justify-end">
-                    
-                    {/* Card 5: Cyberpunk 2077 (5th image, furthest back z-[1]) */}
-                    <div className="absolute right-12 sm:right-15 lg:right-[72px] w-24 sm:w-28 lg:w-[114px] h-36 sm:h-40 lg:h-44 rounded-2xl overflow-hidden border border-black/10 shadow-sm z-[1] bg-[#FCE100]">
-                      <img 
-                        src="/images/cyberpunk.jpg" 
-                        alt="Cyberpunk 2077" 
-                        className="w-full h-full object-cover object-center"
-                        referrerPolicy="no-referrer"
-                      />
-                    </div>
-
-                    {/* Card 4: The Last of Us Part I (4th image z-[2]) */}
-                    <div className="absolute right-9 sm:right-11 lg:right-[54px] w-24 sm:w-28 lg:w-[114px] h-36 sm:h-40 lg:h-44 rounded-2xl overflow-hidden border border-black/10 shadow-sm z-[2] bg-black">
-                      <img 
-                        src={tlouImg} 
-                        alt="The Last of Us Part I" 
-                        className="w-full h-full object-cover object-center"
-                        referrerPolicy="no-referrer"
-                      />
-                    </div>
-
-                    {/* Card 3: Valorant Key Art Poster (3rd image z-[3]) */}
-                    <div className="absolute right-6 sm:right-7.5 lg:right-[36px] w-24 sm:w-28 lg:w-[114px] h-36 sm:h-40 lg:h-44 rounded-2xl overflow-hidden border border-black/10 shadow-sm z-[3] bg-[#E8333D]">
-                      <img 
-                        src={valorantImg} 
-                        alt="Valorant" 
-                        className="w-full h-full object-cover object-center"
-                        referrerPolicy="no-referrer"
-                      />
-                    </div>
-
-                    {/* Card 2: Genshin Impact (2nd image z-[4]) */}
-                    <div className="absolute right-3 sm:right-4 lg:right-[18px] w-24 sm:w-28 lg:w-[114px] h-36 sm:h-40 lg:h-44 rounded-2xl overflow-hidden border border-black/10 shadow-sm z-[4] bg-white">
-                      <img 
-                        src={genshinImg} 
-                        alt="Genshin Impact" 
-                        className="w-full h-full object-cover object-center"
-                        referrerPolicy="no-referrer"
-                      />
-                    </div>
-
-                    {/* Card 1 (Frontmost): Forza Horizon 6 (1st image z-[5]) */}
-                    <div className="absolute right-0 w-24 sm:w-28 lg:w-[114px] h-36 sm:h-40 lg:h-44 rounded-2xl shadow-[0_10px_24px_rgba(0,0,0,0.25)] border border-white/40 overflow-hidden z-[5] bg-white">
-                      <img 
-                        src={fh6Img} 
-                        alt="Forza Horizon 6" 
-                        className="w-full h-full object-cover object-center"
-                        referrerPolicy="no-referrer"
-                      />
-                    </div>
-
-                  </div>
+                {/* 3D Stacked Game Cards using React Bits <CardSwap /> */}
+                <div className="absolute right-0 sm:right-3 md:right-5 lg:right-6 top-1/2 -translate-y-1/2 w-[160px] sm:w-[190px] h-[220px] flex items-center justify-end pointer-events-auto">
+                  <CardSwap
+                    width={128}
+                    height={172}
+                    cardDistance={22}
+                    verticalDistance={25}
+                    delay={2800}
+                    swapOnHoverOnly={true}
+                    isHovered={isGamesHovered}
+                    skewAmount={5}
+                    easing="elastic"
+                  >
+                    {gameCards.map((card) => (
+                      <Card 
+                        key={card.id} 
+                        borderColor={card.borderColor}
+                        style={{
+                          boxShadow: `0 8px 24px -4px ${card.glow}, 0 2px 8px rgba(0,0,0,0.2)`
+                        }}
+                        className="cursor-pointer select-none transition-shadow duration-300"
+                      >
+                        <img 
+                          src={card.image} 
+                          alt={card.title} 
+                          className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none select-none"
+                          referrerPolicy="no-referrer"
+                        />
+                        <div className="absolute inset-0 p-2.5 sm:p-3 flex flex-col justify-end gap-0.5 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none">
+                          <span 
+                            style={{ color: card.tagColor }}
+                            className="text-[8px] sm:text-[9px] font-bold tracking-wider font-['Geist_Mono',monospace] uppercase"
+                          >
+                            {card.tag}
+                          </span>
+                          <span className="text-[12px] sm:text-[13px] font-extrabold text-white leading-tight font-['Geist',sans-serif] truncate drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]">
+                            {card.title}
+                          </span>
+                        </div>
+                      </Card>
+                    ))}
+                  </CardSwap>
                 </div>
               </div>
 

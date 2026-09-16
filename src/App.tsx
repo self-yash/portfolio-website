@@ -6,6 +6,8 @@
 import Background from './components/Background';
 import Marquee from './components/Marquee';
 import AboutSection from './components/AboutSection';
+import GlassSurface from './components/GlassSurface';
+import Lanyard from './components/Lanyard';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import Lenis from 'lenis';
@@ -71,7 +73,8 @@ export default function App() {
       }
 
       const target = e.target as HTMLElement | null;
-      if (target && target.closest('button, a, [role="button"], input, textarea')) {
+      const isLanyardGrab = document.body.style.cursor === 'grab' || document.body.style.cursor === 'grabbing';
+      if ((target && target.closest('button, a, [role="button"], input, textarea')) || isLanyardGrab) {
         setIsHoveringClickable(true);
       } else {
         setIsHoveringClickable(false);
@@ -292,7 +295,7 @@ export default function App() {
     <div className="relative w-full min-h-screen bg-black text-white font-sans selection:bg-blue-500/30 overflow-x-clip">
       
       {/* Hero Section (Sticky underneath) */}
-      <section className={`sticky top-0 w-full h-[100dvh] overflow-hidden z-0 ${isHeroHovered ? 'md:cursor-none md:[&_*]:cursor-none' : ''}`}>
+      <section className={`sticky top-0 w-full h-[100dvh] overflow-hidden z-0 ${isHeroHovered ? 'md:cursor-none' : ''}`}>
         {/* Full-bleed background & glass panes stay unscaled and unblurred */}
         <Background />
         
@@ -320,7 +323,7 @@ export default function App() {
           }}
         >
           {/* Navbar */}
-          <nav aria-label="Main Navigation" className="absolute top-0 left-0 w-full z-20 flex items-center justify-between px-8 py-6 md:px-16 md:py-8">
+          <nav aria-label="Main Navigation" className="absolute top-0 left-0 w-full z-40 flex items-center justify-between px-8 py-6 md:px-16 md:py-8 pointer-events-auto">
             <button 
               onClick={scrollToHome}
               className="text-[16px] md:text-[18px] lg:text-[20px] font-['Giordani_Registry','GIORDANI_Registry',serif] tracking-normal uppercase flex-1 cursor-pointer select-none transition-opacity hover:opacity-80 leading-none text-left bg-transparent border-0 p-0 text-white rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-4 focus-visible:ring-offset-black/50"
@@ -390,12 +393,12 @@ export default function App() {
           </nav>
 
           {/* Main Content */}
-          <main className="absolute inset-0 z-10 flex flex-col justify-center px-8 md:px-16 max-w-4xl pt-16">
+          <main className="absolute inset-0 z-20 flex flex-col justify-center px-8 md:px-16 max-w-4xl pt-16 pointer-events-none">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
-              className="flex flex-col"
+              className="flex flex-col pointer-events-auto"
             >
               <div className="-translate-y-8 md:-translate-y-12">
                 <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[80px] font-['Geist',sans-serif] font-medium tracking-tight mb-4 leading-tight flex flex-col items-start">
@@ -467,6 +470,14 @@ export default function App() {
               </div>
             </motion.div>
           </main>
+
+          {/* 3D Interactive Lanyard with YM Badge (Full-width viewport, layered behind navbar) */}
+          <div 
+            className="absolute inset-0 w-full h-full hidden md:block z-10 pointer-events-auto select-none overflow-hidden"
+            aria-label="Interactive 3D Badge"
+          >
+            <Lanyard position={[0, 0, 20]} gravity={[0, -40, 0]} />
+          </div>
         </motion.div>
 
         {/* Marquee stays pinned at bottom-0 */}
@@ -498,52 +509,65 @@ export default function App() {
             }}
             className="fixed top-5 md:top-8 left-1/2 z-50 flex items-center justify-center pointer-events-auto max-w-[calc(100vw-24px)]"
           >
-            <div role="tablist" aria-label="Floating Navigation" className="flex items-center gap-0.5 sm:gap-1 p-0.5 sm:p-1 rounded-full bg-[rgba(255,255,255,0.72)] backdrop-blur-[20px] backdrop-saturate-[180%] border border-black/10 text-[12px] sm:text-[15px] font-['Geist_Mono',monospace] font-bold shadow-[0_8px_32px_rgba(0,0,0,0.08)] max-w-full">
-              <button 
-                onClick={scrollToHome}
-                className={`px-3 py-1.5 sm:px-5 sm:py-2 rounded-full transition-all whitespace-nowrap cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-black/80 focus-visible:ring-offset-2 focus-visible:ring-offset-white/80 ${
-                  activeSection === 'home'
-                    ? "border border-black/[0.04] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] text-black"
-                    : "border border-transparent hover:bg-black/5 text-black/70 hover:text-black"
-                }`}
-                aria-current={activeSection === 'home' ? 'page' : undefined}
-              >
-                Home
-              </button>
-              <button 
-                onClick={scrollToAbout}
-                className={`px-3 py-1.5 sm:px-5 sm:py-2 rounded-full transition-all whitespace-nowrap cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-black/80 focus-visible:ring-offset-2 focus-visible:ring-offset-white/80 ${
-                  activeSection === 'about'
-                    ? "border border-black/[0.04] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] text-black"
-                    : "border border-transparent hover:bg-black/5 text-black/70 hover:text-black"
-                }`}
-                aria-current={activeSection === 'about' ? 'page' : undefined}
-              >
-                About
-              </button>
-              <button 
-                onClick={scrollToProject}
-                className={`px-3 py-1.5 sm:px-5 sm:py-2 rounded-full transition-all whitespace-nowrap cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-black/80 focus-visible:ring-offset-2 focus-visible:ring-offset-white/80 ${
-                  activeSection === 'projects'
-                    ? "border border-black/[0.04] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] text-black"
-                    : "border border-transparent hover:bg-black/5 text-black/70 hover:text-black"
-                }`}
-                aria-current={activeSection === 'projects' ? 'page' : undefined}
-              >
-                Project
-              </button>
-              <button 
-                onClick={scrollToStack}
-                className={`px-3 py-1.5 sm:px-5 sm:py-2 rounded-full transition-all whitespace-nowrap cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-black/80 focus-visible:ring-offset-2 focus-visible:ring-offset-white/80 ${
-                  activeSection === 'stack'
-                    ? "border border-black/[0.04] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] text-black"
-                    : "border border-transparent hover:bg-black/5 text-black/70 hover:text-black"
-                }`}
-                aria-current={activeSection === 'stack' ? 'page' : undefined}
-              >
-                Stack
-              </button>
-            </div>
+            <GlassSurface
+              width="auto"
+              height="auto"
+              borderRadius={9999}
+              backgroundOpacity={0.72}
+              saturation={1.8}
+              blur={14}
+              borderWidth={0.05}
+              distortionScale={-120}
+              className="rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.12)] border border-black/10 max-w-full"
+              contentClassName="p-0.5 sm:p-1"
+            >
+              <div role="tablist" aria-label="Floating Navigation" className="flex items-center gap-0.5 sm:gap-1 text-[12px] sm:text-[15px] font-['Geist_Mono',monospace] font-bold">
+                <button 
+                  onClick={scrollToHome}
+                  className={`px-3 py-1.5 sm:px-5 sm:py-2 rounded-full transition-all whitespace-nowrap cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-black/80 focus-visible:ring-offset-2 focus-visible:ring-offset-white/80 ${
+                    activeSection === 'home'
+                      ? "border border-black/[0.04] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] text-black"
+                      : "border border-transparent hover:bg-black/5 text-black/70 hover:text-black"
+                  }`}
+                  aria-current={activeSection === 'home' ? 'page' : undefined}
+                >
+                  Home
+                </button>
+                <button 
+                  onClick={scrollToAbout}
+                  className={`px-3 py-1.5 sm:px-5 sm:py-2 rounded-full transition-all whitespace-nowrap cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-black/80 focus-visible:ring-offset-2 focus-visible:ring-offset-white/80 ${
+                    activeSection === 'about'
+                      ? "border border-black/[0.04] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] text-black"
+                      : "border border-transparent hover:bg-black/5 text-black/70 hover:text-black"
+                  }`}
+                  aria-current={activeSection === 'about' ? 'page' : undefined}
+                >
+                  About
+                </button>
+                <button 
+                  onClick={scrollToProject}
+                  className={`px-3 py-1.5 sm:px-5 sm:py-2 rounded-full transition-all whitespace-nowrap cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-black/80 focus-visible:ring-offset-2 focus-visible:ring-offset-white/80 ${
+                    activeSection === 'projects'
+                      ? "border border-black/[0.04] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] text-black"
+                      : "border border-transparent hover:bg-black/5 text-black/70 hover:text-black"
+                  }`}
+                  aria-current={activeSection === 'projects' ? 'page' : undefined}
+                >
+                  Project
+                </button>
+                <button 
+                  onClick={scrollToStack}
+                  className={`px-3 py-1.5 sm:px-5 sm:py-2 rounded-full transition-all whitespace-nowrap cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-black/80 focus-visible:ring-offset-2 focus-visible:ring-offset-white/80 ${
+                    activeSection === 'stack'
+                      ? "border border-black/[0.04] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] text-black"
+                      : "border border-transparent hover:bg-black/5 text-black/70 hover:text-black"
+                  }`}
+                  aria-current={activeSection === 'stack' ? 'page' : undefined}
+                >
+                  Stack
+                </button>
+              </div>
+            </GlassSurface>
           </motion.div>
         )}
       </AnimatePresence>
