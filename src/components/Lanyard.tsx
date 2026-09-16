@@ -172,6 +172,8 @@ function Band({
   const ang = useMemo(() => new THREE.Vector3(), []);
   const rot = useMemo(() => new THREE.Vector3(), []);
   const dir = useMemo(() => new THREE.Vector3(), []);
+  const cardQuat = useMemo(() => new THREE.Quaternion(), []);
+  const cardAnchorVec = useMemo(() => new THREE.Vector3(), []);
 
   // Compute anchor in the top-right quadrant so it hangs gracefully on the right side of hero
   const anchorX = useMemo(() => {
@@ -262,7 +264,7 @@ function Band({
   useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 1]);
   useSphericalJoint(j3, card, [
     [0, 0, 0],
-    [0, 1.5, 0]
+    [0, 1.25, 0]
   ]);
 
   useEffect(() => {
@@ -360,7 +362,15 @@ function Band({
       });
 
       if (j3.current && j2.current?.lerped && j1.current?.lerped && fixed.current) {
-        curve.points[0].copy(j3.current.translation());
+        if (card.current?.translation && card.current?.rotation) {
+          const cTrans = card.current.translation();
+          const cRot = card.current.rotation();
+          cardQuat.set(cRot.x, cRot.y, cRot.z, cRot.w);
+          cardAnchorVec.set(0, 1.25, 0).applyQuaternion(cardQuat).add(cTrans);
+          curve.points[0].copy(cardAnchorVec);
+        } else {
+          curve.points[0].copy(j3.current.translation());
+        }
         curve.points[1].copy(j2.current.lerped);
         curve.points[2].copy(j1.current.lerped);
         curve.points[3].copy(fixed.current.translation());
