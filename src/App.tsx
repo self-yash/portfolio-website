@@ -33,7 +33,7 @@ export default function App() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [wordIndex, setWordIndex] = useState(0);
 
-  const { scrollY } = useScroll();
+  const { scrollY, scrollYProgress } = useScroll();
   const [windowHeight, setWindowHeight] = useState(800);
   const [showAboutNavbar, setShowAboutNavbar] = useState(false);
   const [isToolboxOpen, setIsToolboxOpen] = useState(false);
@@ -557,7 +557,7 @@ export default function App() {
               blur={14}
               borderWidth={0.05}
               distortionScale={-120}
-              className="rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.12)] border border-black/10 max-w-full"
+              className="rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.12)] border border-black/10 max-w-full relative overflow-hidden"
               contentClassName="p-0.5 sm:p-1"
             >
               <div role="tablist" aria-label="Floating Navigation" className="flex items-center gap-0.5 sm:gap-1 text-[12px] sm:text-[15px] font-['Geist_Mono',monospace] font-bold">
@@ -606,6 +606,12 @@ export default function App() {
                   Stack
                 </button>
               </div>
+
+              {/* Overall website scroll position progress line on the lower inside stroke of navbar */}
+              <motion.div
+                className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#0066FF] via-[#0099FF] to-[#00DFD8] shadow-[0_0_6px_rgba(0,153,255,0.7)] pointer-events-none z-20"
+                style={{ scaleX: scrollYProgress, transformOrigin: '0% 50%' }}
+              />
             </GlassSurface>
           </motion.div>
         )}
