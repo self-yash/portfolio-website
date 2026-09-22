@@ -38,8 +38,17 @@ export default function App() {
   const [showAboutNavbar, setShowAboutNavbar] = useState(false);
   const [isToolboxOpen, setIsToolboxOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<'home' | 'about' | 'projects' | 'stack'>('home');
+  const [isLanyardReady, setIsLanyardReady] = useState(false);
   const aboutRef = useRef<HTMLDivElement>(null);
   const lenisRef = useRef<Lenis | null>(null);
+
+  // Delay the entrance of the interactive 3D lanyard card by 1 second
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLanyardReady(true);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   // High-performance Hero section custom circle cursor (zero React re-renders, 0ms lag)
   const cursorRef = useRef<HTMLDivElement>(null);
@@ -348,15 +357,24 @@ export default function App() {
           ))}
         </motion.div>
 
-        {/* 3D Interactive Lanyard with YM Badge: Layered behind navbar, NO push-back/scale, only blurs on scroll */}
+        {/* 3D Interactive Lanyard with YM Badge: Layered behind navbar, enters after 1s delay, only blurs on scroll */}
         <motion.div 
-          className="absolute inset-0 w-full h-full hidden md:block z-10 pointer-events-auto select-none overflow-hidden"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: isLanyardReady ? 1 : 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className={`absolute inset-0 w-full h-full hidden md:block z-10 select-none overflow-hidden ${
+            isLanyardReady ? 'pointer-events-auto' : 'pointer-events-none'
+          }`}
           style={{ 
             filter: blurFilter,
           }}
           aria-label="Interactive 3D Badge"
         >
-          <Lanyard position={[0, 0, 20]} gravity={[0, -40, 0]} isHeroActive={isHeroActive} />
+          <Lanyard 
+            position={[0, 0, 20]} 
+            gravity={[0, -40, 0]} 
+            isHeroActive={isHeroActive && isLanyardReady} 
+          />
         </motion.div>
 
         {/* Content layer that recedes (scale, blur, opacity) on scroll */}
