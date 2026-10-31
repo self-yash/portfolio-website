@@ -8,8 +8,9 @@ import Marquee from './components/Marquee';
 import AboutSection from './components/AboutSection';
 import GlassSurface from './components/GlassSurface';
 import Lanyard from './components/Lanyard';
+import PageLoader from './components/PageLoader';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Lenis from 'lenis';
 import Snap from 'lenis/snap';
 
@@ -38,20 +39,58 @@ export default function App() {
   const [showAboutNavbar, setShowAboutNavbar] = useState(false);
   const [isToolboxOpen, setIsToolboxOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<'home' | 'about' | 'projects' | 'stack'>('home');
+  const [isSiteLoaded, setIsSiteLoaded] = useState(false);
   const [isLanyardReady, setIsLanyardReady] = useState(false);
   const aboutRef = useRef<HTMLDivElement>(null);
   const lenisRef = useRef<Lenis | null>(null);
 
-  // Delay the entrance of the interactive 3D lanyard card by 1 second
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLanyardReady(true);
-    }, 1000);
-    return () => clearTimeout(timer);
+  const handleLoaderFinish = useCallback(() => {
+    setIsSiteLoaded(true);
   }, []);
+
+  // Lock scroll while intro loading animation is playing
+  useEffect(() => {
+    if (!isSiteLoaded) {
+      document.body.style.overflow = 'hidden';
+      window.scrollTo(0, 0);
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isSiteLoaded]);
+
+  // Entrance of the interactive 3D lanyard card after the loader finishes and reveals the website (1s delay)
+  useEffect(() => {
+    if (isSiteLoaded) {
+      const timer = setTimeout(() => {
+        setIsLanyardReady(true);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [isSiteLoaded]);
 
   // High-performance Hero section custom circle cursor (zero React re-renders, 0ms lag)
   const cursorRef = useRef<HTMLDivElement>(null);
+  const isSiteLoadedRef = useRef(isSiteLoaded);
+  const lastMousePosRef = useRef<{ x: number; y: number } | null>(null);
+
+  useEffect(() => {
+    isSiteLoadedRef.current = isSiteLoaded;
+    if (isSiteLoaded && cursorRef.current && lastMousePosRef.current && window.innerWidth >= 768) {
+      const { x, y } = lastMousePosRef.current;
+      cursorRef.current.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      let inHero = true;
+      if (aboutRef.current) {
+        const aboutRect = aboutRef.current.getBoundingClientRect();
+        inHero = y < aboutRect.top && y >= 0 && y <= window.innerHeight;
+      }
+      if (inHero) {
+        cursorRef.current.style.opacity = '1';
+      }
+    }
+  }, [isSiteLoaded]);
 
   useEffect(() => {
     const cursor = cursorRef.current;
@@ -61,8 +100,10 @@ export default function App() {
     let isClickable = false;
 
     const handleGlobalMouseMove = (e: MouseEvent) => {
-      // Disable custom cursor on mobile / touch screens
-      if (window.innerWidth < 768) {
+      lastMousePosRef.current = { x: e.clientX, y: e.clientY };
+
+      // Disable custom cursor on mobile / touch screens or while page is still loading
+      if (window.innerWidth < 768 || !isSiteLoadedRef.current) {
         if (isVisible) {
           cursor.style.opacity = '0';
           isVisible = false;
@@ -98,16 +139,20 @@ export default function App() {
         if (clickable !== isClickable) {
           isClickable = clickable;
           if (clickable) {
-            cursor.style.width = '16px';
-            cursor.style.height = '16px';
-            cursor.style.marginLeft = '-8px';
-            cursor.style.marginTop = '-8px';
+            cursor.style.width = '14px';
+            cursor.style.height = '14px';
+            cursor.style.marginLeft = '-7px';
+            cursor.style.marginTop = '-7px';
+            cursor.style.backgroundColor = '#ffffff';
+            cursor.style.border = 'none';
             cursor.style.boxShadow = '0 0 10px 2px rgba(255,255,255,0.8), 0 0 0 2px rgba(255,255,255,0.4)';
           } else {
             cursor.style.width = '8px';
             cursor.style.height = '8px';
             cursor.style.marginLeft = '-4px';
             cursor.style.marginTop = '-4px';
+            cursor.style.backgroundColor = '#ffffff';
+            cursor.style.border = 'none';
             cursor.style.boxShadow = '0 0 8px rgba(255,255,255,0.7)';
           }
         }
@@ -125,7 +170,7 @@ export default function App() {
       window.removeEventListener('mousemove', handleGlobalMouseMove);
       document.removeEventListener('mouseleave', handleMouseLeaveWindow);
     };
-  }, []);
+  }, [isSiteLoaded]);
 
   const scrollToHome = () => {
     if (lenisRef.current) {
@@ -313,6 +358,9 @@ export default function App() {
   }, [scrollY, windowHeight]);
 
   useEffect(() => {
+    // Keep hero text frozen on "Backend Developer" until preloader completes
+    if (!isSiteLoaded) return;
+
     const currentWord = words[wordIndex] || (isPhone ? "Backend Dev" : "Backend Developer");
     let timer: NodeJS.Timeout;
 
@@ -326,7 +374,8 @@ export default function App() {
       }, 50);
     } else {
       if (text === currentWord) {
-        timer = setTimeout(() => setIsDeleting(true), 2000);
+        // Pause on the fully typed word for 2.5s before deleting
+        timer = setTimeout(() => setIsDeleting(true), 2500);
       } else {
         timer = setTimeout(() => {
           setText(currentWord.substring(0, text.length + 1));
@@ -334,10 +383,12 @@ export default function App() {
       }
     }
     return () => clearTimeout(timer);
-  }, [text, isDeleting, wordIndex, words, isPhone]);
+  }, [text, isDeleting, wordIndex, words, isPhone, isSiteLoaded]);
 
   return (
     <div className="relative w-full min-h-screen bg-black text-white font-sans selection:bg-blue-500/30 overflow-x-clip">
+      {/* Full-Page Liquid Glass Intro & Loader */}
+      <PageLoader onFinish={handleLoaderFinish} />
       
       {/* Hero Section (Sticky underneath) */}
       <section className="sticky top-0 w-full h-[100dvh] overflow-hidden z-0 hero-custom-cursor-area md:cursor-none">
@@ -400,7 +451,7 @@ export default function App() {
             {/* Glass Pill */}
             <motion.div 
               initial={{ y: -40, scale: 0.9, opacity: 0, filter: "blur(10px)" }}
-              animate={{ y: 0, scale: 1, opacity: 1, filter: "blur(0px)" }}
+              animate={isSiteLoaded ? { y: 0, scale: 1, opacity: 1, filter: "blur(0px)" } : { y: -40, scale: 0.9, opacity: 0, filter: "blur(10px)" }}
               transition={{ type: "spring", stiffness: 120, damping: 14, delay: 0.2 }}
               className="hidden md:flex flex-1 justify-center z-50"
             >
@@ -461,7 +512,7 @@ export default function App() {
           <main className="absolute inset-0 z-20 flex flex-col justify-center px-8 md:px-16 max-w-4xl pt-16 pointer-events-none">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              animate={isSiteLoaded ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
               className="flex flex-col pointer-events-auto"
             >
@@ -638,7 +689,7 @@ export default function App() {
       {/* Small white circle cursor active when hovering in Hero section (hidden on mobile screens) */}
       <div 
         ref={cursorRef}
-        className="hidden md:block fixed top-0 left-0 pointer-events-none z-[9999] rounded-full bg-white opacity-0"
+        className="hidden md:block fixed top-0 left-0 pointer-events-none z-[99999] rounded-full bg-white opacity-0"
         style={{
           width: '8px',
           height: '8px',
