@@ -181,8 +181,8 @@ export default function PageLoader({ onFinish }: PageLoaderProps) {
             filter: 'blur(8px)',
             transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] },
           }}
-          className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white select-none pointer-events-auto overflow-hidden"
-          style={{ backgroundColor: '#ffffff' }}
+          className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#F8F8F9] select-none pointer-events-auto overflow-hidden"
+          style={{ backgroundColor: '#F8F8F9' }}
         >
           {/* Main Logo Stage (shifted up by 10px total) */}
           <div className="relative w-full max-w-2xl flex flex-col items-center justify-center -translate-y-[10px]">
@@ -193,7 +193,7 @@ export default function PageLoader({ onFinish }: PageLoaderProps) {
                 ending="logo"
                 preset="soft glow"
                 theme="light"
-                background="#ffffff"
+                background="#F8F8F9"
                 tileColor="#e8ecf2"
                 logoColor="#09111b"
                 style={{ height: 480 }}
