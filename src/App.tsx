@@ -405,7 +405,7 @@ export default function App() {
         {/* Full-bleed background & glass panes stay unscaled and unblurred */}
         <Background />
         
-        {/* Glass Panes (Light: 0° / 80%, Refraction: 100, Depth: 100, Dispersion: 0, Frost: 100, Splay: 0) */}
+        {/* Glass Panes */}
         <motion.div 
           className="absolute top-0 left-1/2 -translate-x-1/2 w-[6080px] h-full z-[5] flex pointer-events-none"
           style={{ opacity: glassPanesOpacity }}
@@ -413,24 +413,7 @@ export default function App() {
           {[...Array(20)].map((_, i) => (
             <div 
               key={i} 
-              className="w-[304px] h-full shrink-0 border-l border-white/[0.18] backdrop-blur-[68px] backdrop-saturate-[1.12] backdrop-brightness-[1.02]"
-              style={{
-                background: [
-                  // 0° top-down directional light at 80% intensity
-                  'linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.06) 24%, rgba(255, 255, 255, 0.01) 60%, rgba(0, 8, 20, 0.08) 100%)',
-                  // Achromatic edge refraction (100) + slab depth (100), dispersion (0)
-                  'linear-gradient(90deg, rgba(255, 255, 255, 0.34) 0%, rgba(0, 10, 28, 0.22) 2.5%, rgba(255, 255, 255, 0.14) 7%, rgba(255, 255, 255, 0.02) 18%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.02) 82%, rgba(255, 255, 255, 0.10) 93%, rgba(0, 10, 28, 0.24) 97.5%, rgba(255, 255, 255, 0.20) 100%)',
-                ].join(', '),
-                // Crisp 80% top-edge catchlight & deep internal bevels with 0 splay
-                boxShadow: [
-                  'inset 0 1px 0 rgba(255, 255, 255, 0.80)',
-                  'inset 0 12px 24px -10px rgba(255, 255, 255, 0.28)',
-                  'inset 1px 0 0 rgba(255, 255, 255, 0.45)',
-                  'inset -1px 0 0 rgba(255, 255, 255, 0.16)',
-                  'inset 14px 0 22px -12px rgba(255, 255, 255, 0.22)',
-                  'inset -14px 0 22px -12px rgba(0, 10, 28, 0.28)',
-                ].join(', '),
-              }}
+              className="w-[304px] h-full border-l border-white/[0.15] bg-white/[0.04] backdrop-blur-[60px] shadow-[inset_1px_0_0_rgba(255,255,255,0.2)]"
             />
           ))}
         </motion.div>
