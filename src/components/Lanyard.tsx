@@ -193,7 +193,13 @@ function Band({
     return -(viewport.height / 2) + marqueeHeightPx * unitsPerPx;
   }, [viewport.height, size.height]);
 
-  const segmentProps: any = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 5, linearDamping: 4 };
+  const initialAnchor = useMemo(() => ({ x: anchorX, y: anchorY }), []);
+  const prevAnchorRef = useRef({ x: initialAnchor.x, y: initialAnchor.y });
+
+  const segmentProps: any = useMemo(
+    () => ({ type: 'dynamic', canSleep: true, colliders: false, angularDamping: 5, linearDamping: 4 }),
+    []
+  );
   const { nodes, materials } = useGLTF(cardGLB) as any;
   const texture = useTexture(lanyardImage || lanyard) as any;
   
@@ -259,6 +265,8 @@ function Band({
       new THREE.CatmullRomCurve3([new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()])
   );
   const [dragged, drag] = useState<any>(false);
+  const draggedRef = useRef<any>(false);
+  draggedRef.current = dragged;
   const [hovered, hover] = useState(false);
 
   useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], 1]);
@@ -276,13 +284,46 @@ function Band({
     }
   }, [hovered, dragged]);
 
-  // Adjust floor and anchor translations only when dimensions or anchors actually update (e.g. resize)
+  // Keep floor, anchor, rope joints, and card aligned when viewport resizes (e.g. entering/exiting fullscreen)
   useEffect(() => {
     if (floorRef.current) {
-      floorRef.current.setTranslation({ x: 0, y: marqueeTopY - 1, z: 0 });
+      floorRef.current.setTranslation({ x: 0, y: marqueeTopY - 1, z: 0 }, true);
     }
+
+    const dx = anchorX - prevAnchorRef.current.x;
+    const dy = anchorY - prevAnchorRef.current.y;
+    prevAnchorRef.current = { x: anchorX, y: anchorY };
+
     if (fixed.current) {
-      fixed.current.setTranslation({ x: anchorX, y: anchorY, z: 0 });
+      fixed.current.setTranslation({ x: anchorX, y: anchorY, z: 0 }, true);
+    }
+
+    if (Math.abs(dx) > 0.0001 || Math.abs(dy) > 0.0001) {
+      const minCardY = marqueeTopY + 1.125;
+      [j1, j2, j3].forEach((ref) => {
+        if (ref.current?.translation) {
+          const t = ref.current.translation();
+          const next = { x: t.x + dx, y: t.y + dy, z: t.z };
+          ref.current.setTranslation(next, true);
+          if (ref.current.lerped) {
+            ref.current.lerped.set(next.x, next.y, next.z);
+          }
+        }
+      });
+
+      if (!draggedRef.current && card.current?.translation) {
+        const t = card.current.translation();
+        card.current.setTranslation(
+          {
+            x: Math.max(0, t.x + dx),
+            y: Math.max(minCardY, t.y + dy),
+            z: t.z,
+          },
+          true
+        );
+      }
+    } else {
+      [j1, j2, j3, card].forEach((ref) => ref.current?.wakeUp?.());
     }
   }, [marqueeTopY, anchorX, anchorY]);
 
@@ -411,53 +452,51 @@ function Band({
         <CuboidCollider args={[0.2, 50, 50]} />
       </RigidBody>
 
-      <group position={[anchorX, anchorY, 0]}>
-        <RigidBody ref={fixed} {...segmentProps} type="fixed" />
-        <RigidBody position={[0.5, 0, 0]} ref={j1} {...segmentProps}>
-          <BallCollider args={[0.1]} />
-        </RigidBody>
-        <RigidBody position={[1, 0, 0]} ref={j2} {...segmentProps}>
-          <BallCollider args={[0.1]} />
-        </RigidBody>
-        <RigidBody position={[1.5, 0, 0]} ref={j3} {...segmentProps}>
-          <BallCollider args={[0.1]} />
-        </RigidBody>
-        <RigidBody position={[2, 0, 0]} ref={card} {...segmentProps} type={dragged ? 'kinematicPosition' : 'dynamic'}>
-          {/* Card collider reduced by 10% */}
-          <CuboidCollider args={[0.72, 1.0125, 0.01]} />
-          <group
-            scale={2.025}
-            position={[0, -1.08, -0.05]}
-            onPointerOver={() => hover(true)}
-            onPointerOut={() => hover(false)}
-            onPointerUp={e => ((e.target as HTMLElement).releasePointerCapture(e.pointerId), drag(false))}
-            onPointerDown={e => {
-              (e.target as HTMLElement).setPointerCapture(e.pointerId);
-              drag(new THREE.Vector3().copy(e.point).sub(vec.copy(card.current.translation())));
-            }}
-          >
-            {nodes?.card?.geometry && (
-              <mesh geometry={nodes.card.geometry}>
-                <meshPhysicalMaterial
-                  map={cardMap}
-                  map-anisotropy={16}
-                  clearcoat={isMobile ? 0 : 1}
-                  clearcoatRoughness={0.15}
-                  roughness={0.9}
-                  metalness={0.8}
-                />
-              </mesh>
-            )}
-            {nodes?.clip?.geometry && (
-              <mesh geometry={nodes.clip.geometry} material={materials?.metal} material-roughness={0.3} />
-            )}
-            {nodes?.clamp?.geometry && (
-              <mesh geometry={nodes.clamp.geometry} material={materials?.metal} />
-            )}
-          </group>
-        </RigidBody>
-      </group>
-      <mesh ref={band}>
+      <RigidBody ref={fixed} {...segmentProps} position={[initialAnchor.x, initialAnchor.y, 0]} type="fixed" />
+      <RigidBody position={[initialAnchor.x + 0.5, initialAnchor.y, 0]} ref={j1} {...segmentProps}>
+        <BallCollider args={[0.1]} />
+      </RigidBody>
+      <RigidBody position={[initialAnchor.x + 1, initialAnchor.y, 0]} ref={j2} {...segmentProps}>
+        <BallCollider args={[0.1]} />
+      </RigidBody>
+      <RigidBody position={[initialAnchor.x + 1.5, initialAnchor.y, 0]} ref={j3} {...segmentProps}>
+        <BallCollider args={[0.1]} />
+      </RigidBody>
+      <RigidBody position={[initialAnchor.x + 2, initialAnchor.y, 0]} ref={card} {...segmentProps} type={dragged ? 'kinematicPosition' : 'dynamic'}>
+        {/* Card collider reduced by 10% */}
+        <CuboidCollider args={[0.72, 1.0125, 0.01]} />
+        <group
+          scale={2.025}
+          position={[0, -1.08, -0.05]}
+          onPointerOver={() => hover(true)}
+          onPointerOut={() => hover(false)}
+          onPointerUp={e => ((e.target as HTMLElement).releasePointerCapture(e.pointerId), drag(false))}
+          onPointerDown={e => {
+            (e.target as HTMLElement).setPointerCapture(e.pointerId);
+            drag(new THREE.Vector3().copy(e.point).sub(vec.copy(card.current.translation())));
+          }}
+        >
+          {nodes?.card?.geometry && (
+            <mesh geometry={nodes.card.geometry}>
+              <meshPhysicalMaterial
+                map={cardMap}
+                map-anisotropy={16}
+                clearcoat={isMobile ? 0 : 1}
+                clearcoatRoughness={0.15}
+                roughness={0.9}
+                metalness={0.8}
+              />
+            </mesh>
+          )}
+          {nodes?.clip?.geometry && (
+            <mesh geometry={nodes.clip.geometry} material={materials?.metal} material-roughness={0.3} />
+          )}
+          {nodes?.clamp?.geometry && (
+            <mesh geometry={nodes.clamp.geometry} material={materials?.metal} />
+          )}
+        </group>
+      </RigidBody>
+      <mesh ref={band} frustumCulled={false}>
         <MeshLineGeometryEl />
         <MeshLineMaterialEl
           color="white"
