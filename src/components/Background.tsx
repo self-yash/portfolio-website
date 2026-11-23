@@ -1,8 +1,9 @@
+import React from 'react';
 import { ShaderGradientCanvas, ShaderGradient } from '@shadergradient/react';
 
 const ShaderGradientComponent = ShaderGradient as any;
 
-export default function Background() {
+const Background = React.memo(function Background() {
   return (
     <div className="absolute inset-0 z-0">
       <ShaderGradientCanvas
@@ -23,9 +24,8 @@ export default function Background() {
           destination="onCanvas"
           embedMode="off"
           envPreset="city"
-          format="gif"
           fov={45}
-          frameRate={10}
+          frameRate={240}
           gizmoHelper="hide"
           grain="off"
           lightType="3d"
@@ -53,5 +53,7 @@ export default function Background() {
       </ShaderGradientCanvas>
     </div>
   );
-}
+});
+
+export default Background;
 

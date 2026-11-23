@@ -45,7 +45,7 @@ export interface LanyardProps {
   isHeroActive?: boolean;
 }
 
-export default function Lanyard({
+const Lanyard = React.memo(function Lanyard({
   position = [0, 0, 30],
   gravity = [0, -40, 0],
   fov = 20,
@@ -134,7 +134,9 @@ export default function Lanyard({
       </Canvas>
     </div>
   );
-}
+});
+
+export default Lanyard;
 
 interface BandProps {
   maxSpeed?: number;

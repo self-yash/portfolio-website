@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import { ArrowUpRight, Code2, Music, Video, Gamepad2, Send, PenTool, Terminal, Globe, Network, MessageSquare } from 'lucide-react';
 import ProjectsSection from './ProjectsSection';
 import StackSection from './StackSection';
@@ -87,9 +87,16 @@ export default function AboutSection({
     target: tickerRef,
     offset: ["start end", "end start"]
   });
-  
-  // Starts blank with text offscreen to the right at 100vw, scrolls in and moves across to the left
-  const x = useTransform(scrollYProgress, [0, 1], ["100vw", "-260vw"]);
+
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 70,
+    damping: 26,
+    mass: 0.1,
+    restDelta: 0.001,
+  });
+
+  // Smooth GPU transform gliding across without discrete mousewheel hitching
+  const x = useTransform(smoothProgress, [0, 1], ["20vw", "-130vw"]);
 
   return (
     <section id="about" className="relative w-full min-h-screen bg-[#E5E5E5] text-black pt-0 overflow-hidden selection:bg-blue-500/30">
@@ -546,25 +553,49 @@ export default function AboutSection({
       
     </div>
       
-      {/* Huge Bottom Text (Scrubbed on scroll, starts blank, single filled sequence then stroked sequence, non-looping) */}
+      {/* Huge Bottom Text (Smooth scroll-linked loop, non-selectable) */}
       <div 
         ref={tickerRef} 
         className="relative w-full overflow-hidden whitespace-nowrap py-7 sm:py-9 md:py-12 flex items-center justify-start select-none pointer-events-none"
+        style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
       >
         <motion.div 
-          style={{ x }}
-          className="flex whitespace-nowrap text-[12vw] font-['Space_Grotesk',sans-serif] font-medium tracking-tight leading-none will-change-transform"
+          style={{ 
+            x,
+            willChange: 'transform',
+            transform: 'translateZ(0)',
+            backfaceVisibility: 'hidden',
+          }}
+          className="flex whitespace-nowrap text-[12vw] font-['Space_Grotesk',sans-serif] font-medium tracking-tight leading-none select-none cursor-default"
         >
           {/* 1. Filled Sequence */}
-          <span className="shrink-0 text-black/90">BUILT • SHIPPED • BROKEN • FIXED •&nbsp;</span>
+          <span className="shrink-0 text-black/90 select-none" style={{ userSelect: 'none', WebkitUserSelect: 'none' }}>BUILT • SHIPPED • BROKEN • FIXED •&nbsp;</span>
           {/* 2. Stroked Sequence */}
           <span 
-            className="shrink-0"
+            className="shrink-0 select-none"
             style={{
               WebkitTextStroke: '3px #757575',
               WebkitTextFillColor: 'transparent',
               color: 'transparent',
-              paintOrder: 'stroke fill'
+              paintOrder: 'stroke fill',
+              userSelect: 'none',
+              WebkitUserSelect: 'none',
+            }}
+          >
+            BUILT • SHIPPED • BROKEN • FIXED •&nbsp;
+          </span>
+          {/* 3. Filled Sequence */}
+          <span className="shrink-0 text-black/90 select-none" style={{ userSelect: 'none', WebkitUserSelect: 'none' }}>BUILT • SHIPPED • BROKEN • FIXED •&nbsp;</span>
+          {/* 4. Stroked Sequence */}
+          <span 
+            className="shrink-0 select-none"
+            style={{
+              WebkitTextStroke: '3px #757575',
+              WebkitTextFillColor: 'transparent',
+              color: 'transparent',
+              paintOrder: 'stroke fill',
+              userSelect: 'none',
+              WebkitUserSelect: 'none',
             }}
           >
             BUILT • SHIPPED • BROKEN • FIXED

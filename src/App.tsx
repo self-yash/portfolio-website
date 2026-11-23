@@ -14,6 +14,9 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Lenis from 'lenis';
 import Snap from 'lenis/snap';
 
+const LANYARD_POSITION: [number, number, number] = [0, 0, 20];
+const LANYARD_GRAVITY: [number, number, number] = [0, -40, 0];
+
 export default function App() {
   const [isPhone, setIsPhone] = useState(false);
 
@@ -76,21 +79,34 @@ export default function App() {
   const isSiteLoadedRef = useRef(isSiteLoaded);
   const lastMousePosRef = useRef<{ x: number; y: number } | null>(null);
 
+  const aboutTopRef = useRef(800);
+
+  useEffect(() => {
+    const updateAboutTop = () => {
+      if (aboutRef.current) {
+        aboutTopRef.current = aboutRef.current.getBoundingClientRect().top;
+      }
+    };
+    updateAboutTop();
+    const unsub = scrollY.on('change', updateAboutTop);
+    window.addEventListener('resize', updateAboutTop, { passive: true });
+    return () => {
+      unsub();
+      window.removeEventListener('resize', updateAboutTop);
+    };
+  }, [scrollY]);
+
   useEffect(() => {
     isSiteLoadedRef.current = isSiteLoaded;
     if (isSiteLoaded && cursorRef.current && lastMousePosRef.current && window.innerWidth >= 768) {
       const { x, y } = lastMousePosRef.current;
       cursorRef.current.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-      let inHero = true;
-      if (aboutRef.current) {
-        const aboutRect = aboutRef.current.getBoundingClientRect();
-        inHero = y < aboutRect.top && y >= 0 && y <= window.innerHeight;
-      }
+      const inHero = y < aboutTopRef.current && y >= 0 && y <= windowHeight;
       if (inHero) {
         cursorRef.current.style.opacity = '1';
       }
     }
-  }, [isSiteLoaded]);
+  }, [isSiteLoaded, windowHeight]);
 
   useEffect(() => {
     const cursor = cursorRef.current;
@@ -114,14 +130,8 @@ export default function App() {
       // 1. Instant 0-latency hardware GPU position tracking
       cursor.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
 
-      // 2. Check if pointer is over the hero section (above About section and inside window)
-      let inHero = false;
-      if (aboutRef.current) {
-        const aboutRect = aboutRef.current.getBoundingClientRect();
-        inHero = e.clientY < aboutRect.top && e.clientY >= 0 && e.clientY <= window.innerHeight;
-      } else {
-        inHero = e.clientY >= 0 && e.clientY <= window.innerHeight;
-      }
+      // 2. Check if pointer is over the hero section (cached offset ensures zero DOM reflows at 240Hz / 1000Hz gaming mice)
+      const inHero = e.clientY < aboutTopRef.current && e.clientY >= 0 && e.clientY <= windowHeight;
 
       if (inHero !== isVisible) {
         isVisible = inHero;
@@ -315,10 +325,10 @@ export default function App() {
     }
   }, []);
 
-  // Progressive blur: goes from 0px up to 14px as user scrolls down
+  // Progressive blur: goes from none up to 14px as user scrolls down
   const blurFilter = useTransform(scrollY, (v) => {
     const progress = Math.min(Math.max(v / (windowHeight * 0.75 || 600), 0), 1);
-    return `blur(${(progress * 14).toFixed(1)}px)`;
+    return progress <= 0.001 ? 'none' : `blur(${(progress * 14).toFixed(1)}px)`;
   });
 
   // Scale down and recede into the background
@@ -422,8 +432,8 @@ export default function App() {
           aria-label="Interactive 3D Badge"
         >
           <Lanyard 
-            position={[0, 0, 20]} 
-            gravity={[0, -40, 0]} 
+            position={LANYARD_POSITION} 
+            gravity={LANYARD_GRAVITY} 
             isHeroActive={isHeroActive && isLanyardReady} 
           />
         </motion.div>

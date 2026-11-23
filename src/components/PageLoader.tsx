@@ -9,6 +9,8 @@ import tlouImg from '../assets/images/tlou.jpg';
 import coverFileImg from '../assets/images/cover_file.png';
 import landingPageImg from '../assets/images/landing_page.png';
 import lanyardImg from '../assets/lanyard/lanyard.png';
+import legionLogoImg from '../assets/images/Lenovo_Legion_Logo.png';
+import rogLogoImg from '../assets/images/ROG logo_red.png';
 
 interface PageLoaderProps {
   onFinish: () => void;
@@ -34,6 +36,8 @@ const ASSETS_TO_PRELOAD: string[] = [
   '/images/Notion_app_logo.png',
   '/images/Adobe_After_Effects_CC_icon.svg.webp',
   '/images/Blender_logo_no_text.svg.webp',
+  legionLogoImg,
+  rogLogoImg,
   '/logo.svg',
 ];
 

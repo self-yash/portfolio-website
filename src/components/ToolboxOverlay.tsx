@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X } from 'lucide-react';
+import legionLogoImg from '../assets/images/Lenovo_Legion_Logo.png';
+import rogLogoImg from '../assets/images/ROG logo_red.png';
 
 interface ToolboxOverlayProps {
   isOpen: boolean;
@@ -35,13 +37,27 @@ const row2Tools: ToolItem[] = [
   { name: 'Blender', icon: '/images/Blender_logo_no_text.svg.webp' },
 ];
 
-const systemSpecs: SpecItem[] = [
+const primarySystemSpecs: SpecItem[] = [
+  { label: 'Laptop', value: 'Legion 7' },
+  { label: 'CPU', value: 'Intel Core Ultra 9 275HX' },
+  { label: 'GPU', value: 'NVIDIA GeForce RTX 5060' },
+  { label: 'Storage', value: '1 TB NVMe SSD' },
+  { label: 'RAM', value: '32 GB DDR5' },
+  { label: 'Monitor', value: '16” OLED 240Hz 2.5K HDR\nDolby Vision' },
+];
+
+const secondarySystemSpecs: SpecItem[] = [
   { label: 'Laptop', value: 'ROG Strix G15' },
   { label: 'CPU', value: 'AMD Ryzen 7 6800H' },
-  { label: 'GPU', value: 'NVIDIA GeForce RTX 3050' },
   { label: 'Storage', value: '1 TB NVMe SSD' },
   { label: 'RAM', value: '16 GB DDR5' },
-  { label: 'Monitor', value: '15.6" 144Hz FHD 100% sRGB Anti-Glare Dolby Vision' },
+  { label: 'Monitor', value: '15.6” 144Hz FHD 100% sRGB Anti-Glare\nDolby Vision' },
+];
+
+const accessories: string[] = [
+  'Logitech G102 Lightsync',
+  'boAt Rockerz Prime 415',
+  'realme Buds 2',
 ];
 
 export const ToolboxOverlay: React.FC<ToolboxOverlayProps> = ({ isOpen, onClose, triggerRect }) => {
@@ -133,7 +149,7 @@ export const ToolboxOverlay: React.FC<ToolboxOverlayProps> = ({ isOpen, onClose,
     <AnimatePresence>
       {isOpen && (
         <div 
-          className="fixed inset-0 z-[100] overflow-y-auto overscroll-contain flex justify-center items-start sm:items-center px-6 sm:px-10 md:px-16 lg:px-0 py-6 sm:py-10"
+          className="fixed inset-0 z-[100] overflow-y-auto overscroll-contain flex justify-center items-start px-6 sm:px-10 md:px-16 lg:px-0 py-6 sm:py-10"
           role="dialog"
           aria-modal="true"
           onWheel={(e) => e.stopPropagation()}
@@ -341,63 +357,104 @@ export const ToolboxOverlay: React.FC<ToolboxOverlayProps> = ({ isOpen, onClose,
             </div>
 
             {/* Hardware Content Area */}
-            <div className="w-full p-4 sm:p-6 md:p-7">
-              <div className="bg-[#E7E7EC] rounded-[18px] sm:rounded-[22px] p-3.5 sm:p-5 border border-black/5 max-w-[940px] mx-auto">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4 items-stretch">
-                  {/* Left: System Specs Card */}
-                  <div className="bg-[#F8F8FA] rounded-[14px] sm:rounded-[16px] border border-[#DCE0E6] py-4 sm:py-5 pl-5 sm:pl-6 md:pl-7 pr-4 sm:pr-5 md:pr-5 shadow-[0_1px_4px_rgba(0,0,0,0.02)] flex flex-col justify-between">
-                    <h3 className="text-[13.5px] sm:text-[14.5px] font-['Geist',sans-serif] font-medium text-black text-center pb-4 border-b border-[#E4E4EC] mb-6 sm:mb-7">
-                      System
+            <div className="w-full px-4 sm:px-6 md:px-8 py-5 sm:py-7">
+              <div className="bg-[#E7E7EC] rounded-[18px] sm:rounded-[22px] p-4 sm:p-6 border border-black/[0.06] max-w-[940px] mx-auto">
+                {/* Top Row: Primary System & Secondary System */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 items-stretch">
+                  {/* Left: Primary System Card */}
+                  <div className="relative overflow-hidden bg-[#F8F8FA] rounded-[14px] sm:rounded-[16px] border border-[#CBCBD3] shadow-[0_2px_8px_rgba(0,0,0,0.06)] px-5 sm:px-7 pt-5 sm:pt-6 pb-12 sm:pb-7 flex flex-col">
+                    <h3 className="text-[14px] sm:text-[15px] font-['Geist',sans-serif] font-medium text-black text-center pb-4 sm:pb-5 border-b border-[#CFCFD7]">
+                      Primary System
                     </h3>
 
-                    <div className="flex flex-col space-y-5 sm:space-y-[22px] my-auto">
-                      {systemSpecs.map((spec) => {
-                        const isGPU = spec.label === 'GPU';
-                        return (
-                          <div key={spec.label} className="flex items-start justify-between gap-4 sm:gap-6">
-                            <span className={`w-24 sm:w-28 text-[12.5px] sm:text-[13.5px] font-['Geist',sans-serif] font-normal shrink-0 ${isGPU ? 'line-through text-[#757575]' : 'text-black'}`}>
-                              {spec.label}
-                            </span>
-                            <span className={`text-[12.5px] sm:text-[13.5px] font-['Geist',sans-serif] font-normal leading-snug text-right sm:text-left flex-1 ${isGPU ? 'line-through text-[#757575]' : 'text-[#757575]'}`}>
-                              {spec.value}
-                            </span>
-                          </div>
-                        );
-                      })}
+                    <div className="mt-6 sm:mt-7 flex flex-col space-y-5 sm:space-y-[22px] px-1 sm:px-2">
+                      {primarySystemSpecs.map((spec) => (
+                        <div key={spec.label} className="flex items-start gap-4 sm:gap-6">
+                          <span className="w-[74px] sm:w-[86px] text-[13px] sm:text-[13.5px] font-['Geist',sans-serif] font-normal text-black shrink-0">
+                            {spec.label}
+                          </span>
+                          <span className="text-[13px] sm:text-[13.5px] font-['Geist',sans-serif] font-normal text-[#707078] leading-[1.45] whitespace-pre-line tabular-nums flex-1">
+                            {spec.value}
+                          </span>
+                        </div>
+                      ))}
                     </div>
+
+                    {/* Legion Logo Bottom Right (#757575 at 50% opacity) */}
+                    <div
+                      role="img"
+                      aria-label="Lenovo Legion"
+                      className="absolute bottom-2 right-3 sm:bottom-2.5 sm:right-4 w-[91px] h-[32px] sm:w-[101px] sm:h-[36px] bg-[#757575]/50 select-none pointer-events-none"
+                      style={{
+                        WebkitMaskImage: `url("${legionLogoImg}")`,
+                        maskImage: `url("${legionLogoImg}")`,
+                        WebkitMaskRepeat: 'no-repeat',
+                        maskRepeat: 'no-repeat',
+                        WebkitMaskSize: 'contain',
+                        maskSize: 'contain',
+                        WebkitMaskPosition: 'right bottom',
+                        maskPosition: 'right bottom',
+                      }}
+                    />
                   </div>
 
-                  {/* Right: Accessories Cards */}
-                  <div className="flex flex-col justify-between gap-2.5 sm:gap-3 h-full">
-                    {/* Accessories Header Pill: rounded top, sharp bottom */}
-                    <div className="bg-[#F8F8FA] rounded-t-[12px] sm:rounded-t-[14px] rounded-b-none border border-[#DCE0E6] flex-1 min-h-[48px] sm:min-h-[54px] px-4 flex items-center justify-center shadow-[0_1px_4px_rgba(0,0,0,0.02)]">
-                      <h3 className="text-[13.5px] sm:text-[14.5px] font-['Geist',sans-serif] font-medium text-black">
-                        Accessories
-                      </h3>
+                  {/* Right: Secondary System Card */}
+                  <div className="relative overflow-hidden bg-[#F8F8FA] rounded-[14px] sm:rounded-[16px] border border-[#CBCBD3] shadow-[0_2px_8px_rgba(0,0,0,0.06)] px-5 sm:px-7 pt-5 sm:pt-6 pb-14 sm:pb-7 flex flex-col">
+                    <h3 className="text-[14px] sm:text-[15px] font-['Geist',sans-serif] font-medium text-black text-center pb-4 sm:pb-5 border-b border-[#CFCFD7]">
+                      Secondary System
+                    </h3>
+
+                    <div className="mt-6 sm:mt-7 flex flex-col space-y-5 sm:space-y-[22px] px-1 sm:px-2">
+                      {secondarySystemSpecs.map((spec) => (
+                        <div key={spec.label} className="flex items-start gap-4 sm:gap-6">
+                          <span className="w-[74px] sm:w-[86px] text-[13px] sm:text-[13.5px] font-['Geist',sans-serif] font-normal text-black shrink-0">
+                            {spec.label}
+                          </span>
+                          <span className="text-[13px] sm:text-[13.5px] font-['Geist',sans-serif] font-normal text-[#707078] leading-[1.45] whitespace-pre-line tabular-nums flex-1">
+                            {spec.value}
+                          </span>
+                        </div>
+                      ))}
                     </div>
 
-                    {/* Logitech Mouse Card: all sharp corners */}
-                    <div className="bg-[#F8F8FA] rounded-none border border-[#DCE0E6] flex-1 min-h-[48px] sm:min-h-[54px] px-4 flex items-center justify-center shadow-[0_1px_4px_rgba(0,0,0,0.02)] text-center">
-                      <h4 className="text-[13px] sm:text-[14px] font-['Geist',sans-serif] font-medium text-black">
-                        Logitech G102 Lightsync
-                      </h4>
-                    </div>
-
-                    {/* boAt Headset Card: all sharp corners */}
-                    <div className="bg-[#F8F8FA] rounded-none border border-[#DCE0E6] flex-1 min-h-[48px] sm:min-h-[54px] px-4 flex items-center justify-center shadow-[0_1px_4px_rgba(0,0,0,0.02)] text-center">
-                      <h4 className="text-[13px] sm:text-[14px] font-['Geist',sans-serif] font-medium text-black">
-                        boAt Rockerz Prime 415
-                      </h4>
-                    </div>
-
-                    {/* realme Buds 2 Card: sharp top, rounded bottom */}
-                    <div className="bg-[#F8F8FA] rounded-t-none rounded-b-[14px] sm:rounded-b-[16px] border border-[#DCE0E6] flex-1 min-h-[48px] sm:min-h-[54px] px-4 flex items-center justify-center shadow-[0_1px_4px_rgba(0,0,0,0.02)] text-center">
-                      <h4 className="text-[13px] sm:text-[14px] font-['Geist',sans-serif] font-medium text-black">
-                        realme Buds 2
-                      </h4>
-                    </div>
+                    {/* ROG Logo Bottom Right (#757575 at 50% opacity) */}
+                    <div
+                      role="img"
+                      aria-label="ASUS ROG"
+                      className="absolute bottom-3 -right-1 sm:bottom-3.5 sm:-right-1.5 w-[105px] h-[42px] sm:w-[115px] sm:h-[46px] bg-[#757575]/50 select-none pointer-events-none"
+                      style={{
+                        WebkitMaskImage: `url("${rogLogoImg}")`,
+                        maskImage: `url("${rogLogoImg}")`,
+                        WebkitMaskRepeat: 'no-repeat',
+                        maskRepeat: 'no-repeat',
+                        WebkitMaskSize: 'contain',
+                        maskSize: 'contain',
+                        WebkitMaskPosition: 'right bottom',
+                        maskPosition: 'right bottom',
+                      }}
+                    />
                   </div>
+                </div>
 
+                {/* Middle Row: Accessories Banner (rounded top, sharp bottom) */}
+                <div className="mt-4 sm:mt-5 bg-[#F8F8FA] rounded-t-[14px] sm:rounded-t-[16px] rounded-b-none border border-[#CBCBD3] shadow-[0_2px_8px_rgba(0,0,0,0.06)] py-4 sm:py-[18px] px-4 flex items-center justify-center">
+                  <h3 className="text-[14px] sm:text-[15px] font-['Geist',sans-serif] font-medium text-black">
+                    Accessories
+                  </h3>
+                </div>
+
+                {/* Bottom Row: 3 Accessory Cards (sharp top, rounded bottom) */}
+                <div className="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-3.5">
+                  {accessories.map((item) => (
+                    <div
+                      key={item}
+                      className="bg-[#F8F8FA] rounded-t-none rounded-b-[14px] sm:rounded-b-[16px] border border-[#CBCBD3] shadow-[0_2px_8px_rgba(0,0,0,0.06)] py-4 sm:py-[18px] px-4 flex items-center justify-center text-center"
+                    >
+                      <h4 className="text-[13.5px] sm:text-[14.5px] font-['Geist',sans-serif] font-medium text-black sm:whitespace-nowrap">
+                        {item}
+                      </h4>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
